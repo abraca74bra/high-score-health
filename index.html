@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>High Score Health Point Tracker</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <header>
+
+    </header>
+    <section class="hero">
+        <div class="container">
+            <div class="hero-text">Your Points</div>
+            <div class="hero-counter">0</div>
+        </div>
+    </section>
+    <!-- Tab links -->
+    <div class="tab">
+        <button class="tablinks" onclick="openTab(event, 'Earn')">Earn</button>
+        <button class="tablinks" onclick="openTab(event, 'Redeem')">Redeem</button>
+        <button class="tablinks" onclick="openTab(event, 'Goals')">Goals</button>
+        <button class="tablinks" onclick="openTab(event, 'Achievements')">Achievements</button>
+        <button class="tablinks" onclick="openTab(event, 'History')">History</button>
+    </div>
+
+    <!-- Tab content -->
+    <div id="Earn" class="tabcontent">
+        <h3>Claim Points</h3>
+        <div class = "container">
+            <input type="number">
+            <button><img src="plus-circle.png" height="25px" width="25px"></button>
+        </div>
+    </div>
+
+    <div id="Redeem" class="tabcontent">
+        <h3>Spend Points</h3>
+        <div class = "container">
+            <input type="number">
+            <button><img src="minus-circle.png" height="25px" width="25px"></button>
+        </div>
+    </div>
+
+    <div id="Goals" class="tabcontent">
+        <h3>Reminders to save up points for upcoming events</h3>
+        <p>Content coming soon</p>
+    </div>
+
+    <div id="Achievements" class="tabcontent">
+        <h3>Achievements</h3>
+        <p>Content coming soon</p>
+    </div>
+
+    <div id="History" class="tabcontent">
+        <h3>Points Earned and Redeemed</h3>
+        <p>Content coming soon</p>
+    </div>
+</body>
+
+</html>
