@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>High Score Health Point Tracker</title>
     <link rel="stylesheet" href="style.css" />
+    <script src="buttons.js" type="text/javascript"></script>
 </head>
 
 <body>
@@ -15,7 +16,7 @@
     <section class="hero">
         <div class="container">
             <div class="hero-text">Your Points</div>
-            <div class="hero-counter">0</div>
+            <div class="hero-counter" id="header_total">0</div>
         </div>
     </section>
     <!-- Tab links -->
@@ -31,16 +32,16 @@
     <div id="Earn" class="tabcontent">
         <h3>Claim Points</h3>
         <div class = "container">
-            <input type="number">
-            <button><img src="plus-circle.png" height="25px" width="25px"></button>
+            <input type="number" id="add_points_input">
+            <button class="control" id="add_points_button" onclick="addPoints(event)"><img src="plus-circle.png" height="25px" width="25px"></button>
         </div>
     </div>
 
     <div id="Redeem" class="tabcontent">
         <h3>Spend Points</h3>
         <div class = "container">
-            <input type="number">
-            <button><img src="minus-circle.png" height="25px" width="25px"></button>
+            <input type="number" id="subtract_points_input">
+            <button class="control" id="add_points_button" onclick="subtractPoints(event)"><img src="minus-circle.png" height="25px" width="25px"></button>
         </div>
     </div>
 
