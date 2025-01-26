@@ -41,7 +41,7 @@
         <h3>Spend Points</h3>
         <div class = "container">
             <input type="number" id="subtract_points_input">
-            <button class="control" id="add_points_button" onclick="subtractPoints(event)"><img src="minus-circle.png" height="25px" width="25px"></button>
+            <button class="control" id="subtract_points_button" onclick="subtractPoints(event)"><img src="minus-circle.png" height="25px" width="25px"></button>
         </div>
     </div>
 
@@ -57,6 +57,11 @@
 
     <div id="History" class="tabcontent">
         <h3>Points Earned and Redeemed</h3>
+        <div class = "container">
+            <label>Reset Points Total</label>
+            <input type="number" id="reset_points_input">
+            <button class="control" id="reset_points_button" onclick="resetPoints(event)"><img src="minus-circle.png" height="25px" width="25px"></button>
+        </div>
         <p>Content coming soon</p>
     </div>
 </body>

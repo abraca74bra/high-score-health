@@ -43,11 +43,38 @@ function openTab(evt, tabName) {
   }
 
   function subtractPoints(evt){
-    //Get the value from the header tracking field
-    
     //Get the value from the input field
+    var pointsInput = document.getElementById("subtract_points_input");
+    var pointsToSubtract = parseFloat(pointsInput.value);
+    if(!pointsToSubtract){
+        return
+    }
+    //Reset the input
+    pointsInput.value = '';
+
+    //Get the value from the header tracking field
+    var headerTotal = document.getElementById("header_total");
+    var runningTotal = parseFloat(headerTotal.innerHTML);
 
     //Calculate the new total
+    runningTotal -= pointsToAdd;
 
     //Populate the value in the header tracking field
+    headerTotal.innerHTML = runningTotal;
+    localStorage.setItem("headerTotal", runningTotal);
+  }
+
+  function resetPoints(evt){
+    //Get the value from the input field
+    var pointsInput = document.getElementById("reset_points_input");
+    var resetTotal = parseFloat(pointsInput.value);
+    if(!resetTotal){
+        return
+    }
+    //Reset the input
+    pointsInput.value = '';
+
+    //Populate the value in the header tracking field
+    headerTotal.innerHTML = resetTotal;
+    localStorage.setItem("headerTotal", resetTotal);
   }
