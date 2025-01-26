@@ -23,7 +23,7 @@ function openTab(evt, tabName) {
     
     //Get the value from the input field
     var pointsInput = document.getElementById("add_points_input");
-    var pointsToAdd = pointsInput.value;
+    var pointsToAdd = parseFloat(pointsInput.value);
     if(!pointsToAdd){
         return
     }
@@ -32,13 +32,14 @@ function openTab(evt, tabName) {
 
     //Get the value from the header tracking field
     var headerTotal = document.getElementById("header_total");
-    var runningTotal = headerTotal.innerHTML;
+    var runningTotal = parseFloat(headerTotal.innerHTML);
 
     //Calculate the new total
     runningTotal += pointsToAdd;
 
     //Populate the value in the header tracking field
     headerTotal.innerHTML = runningTotal;
+    localStorage.setItem("headerTotal", runningTotal);
   }
 
   function subtractPoints(evt){
