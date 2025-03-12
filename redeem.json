@@ -1,83 +1,72 @@
-[
-    {
-      "id": 1,
-      "name": "Kombucha",
-      "Points": 10,
-      "lastUsed": "",
-      "timesUsed": 0,
-      "tags": []
-    },
-    {
-      "id": 2,
-      "name": "Fresh Fruit",
-      "Points": 25,
-      "lastUsed": "",
-      "timesUsed": 0,
-      "tags": []
-    },
-    {
-      "id": 3,
-      "name": "Juice",
-      "Points": 50,
-      "lastUsed": "",
-      "timesUsed": 0,
-      "tags": []
-    },
-    {
-      "id": 4,
-      "name": "Cookie",
-      "Points": 80,
-      "lastUsed": "",
-      "timesUsed": 0,
-      "tags": []
-    },
-    {
-      "id": 5,
-      "name": "Hot Chocolate",
-      "Points": 100,
-      "lastUsed": "",
-      "timesUsed": 0,
-      "tags": []
-    },
-    {
-      "id": 6,
-      "name": "Wine",
-      "Points": 120,
-      "lastUsed": "",
-      "timesUsed": 0,
-      "tags": []
-    },
-    {
-      "id": 7,
-      "name": "Whiskey",
-      "Points": 140,
-      "lastUsed": "",
-      "timesUsed": 0,
-      "tags": []
-    },
-    {
-      "id": 8,
-      "name": "Cocktail",
-      "Points": 250,
-      "lastUsed": "",
-      "timesUsed": 0,
-      "tags": []
-    },
-    {
-      "id": 9,
-      "name": "Ice Cream",
-      "Points": 250,
-      "lastUsed": "",
-      "timesUsed": 0,
-      "tags": []
-    },
-    {
-      "id": 10,
-      "name": "Pizza",
-      "Points": 350,
-      "lastUsed": "",
-      "timesUsed": 0,
-      "tags": []
-    }
-  ]
-  
+{
+  "1": {
+    "name": "Kombucha",
+    "Points": 10,
+    "lastUsed": "",
+    "timesUsed": 0,
+    "tags": []
+  },
+  "2": {
+    "name": "Fresh Fruit",
+    "Points": 25,
+    "lastUsed": "",
+    "timesUsed": 0,
+    "tags": []
+  },
+  "3": {
+    "name": "Juice",
+    "Points": 50,
+    "lastUsed": "",
+    "timesUsed": 0,
+    "tags": []
+  },
+  "4": {
+    "name": "Cookie",
+    "Points": 80,
+    "lastUsed": "",
+    "timesUsed": 0,
+    "tags": []
+  },
+  "5": {
+    "name": "Hot Chocolate",
+    "Points": 100,
+    "lastUsed": "",
+    "timesUsed": 0,
+    "tags": []
+  },
+  "6": {
+    "name": "Wine",
+    "Points": 120,
+    "lastUsed": "",
+    "timesUsed": 0,
+    "tags": []
+  },
+  "7": {
+    "name": "Whiskey",
+    "Points": 140,
+    "lastUsed": "",
+    "timesUsed": 0,
+    "tags": []
+  },
+  "8": {
+    "name": "Cocktail",
+    "Points": 250,
+    "lastUsed": "",
+    "timesUsed": 0,
+    "tags": []
+  },
+  "9": {
+    "name": "Ice Cream",
+    "Points": 250,
+    "lastUsed": "",
+    "timesUsed": 0,
+    "tags": []
+  },
+  "10": {
+    "name": "Pizza",
+    "Points": 350,
+    "lastUsed": "",
+    "timesUsed": 0,
+    "tags": []
+  }
+}
