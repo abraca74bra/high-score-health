@@ -10,6 +10,31 @@ function onLoad() {
     var headerTotal = document.getElementById("header_total");
     headerTotal.innerHTML = runningTotal;
 
+    populateTab("Earn", "earn.json");
+    populateTab("Redeem", "redeem.json");
+    populateTab("History", "history.json");
+}
+
+function populateTab(tabId, fileName){
+    console.log('Retrieving data from ' + fileName);
+    
+    var content = loadJSON(fileName);
+    console.log(content);
+}
+
+async function loadJSON(fileName) {
+    try {
+        const response = await fetch(fileName);
+        if (!response.ok) {
+            throw new Error(`Failed to load JSON: ${response.statusText}`);
+        }
+        const jsonData = await response.json(); 
+        
+        return jsonData
+
+    } catch (error) {
+        console.error('Error loading JSON:', error);
+    }
 }
 
 function openTab(evt, tabName) {
