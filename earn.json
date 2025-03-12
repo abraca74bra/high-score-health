@@ -1,0 +1,98 @@
+[
+    {
+      "id": 1,
+      "name": "Ring Fit 45 min",
+      "pointValue": 250,
+      "lastUsed": "",
+      "timesUsed": 0,
+      "tags": []
+    },
+    {
+      "id": 2,
+      "name": "Row 30 min",
+      "pointValue": 250,
+      "lastUsed": "",
+      "timesUsed": 0,
+      "tags": []
+    },
+    {
+      "id": 3,
+      "name": "Row 60 min",
+      "pointValue": 400,
+      "lastUsed": "",
+      "timesUsed": 0,
+      "tags": []
+    },
+    {
+      "id": 4,
+      "name": "Run 30 min",
+      "pointValue": 300,
+      "lastUsed": "",
+      "timesUsed": 0,
+      "tags": []
+    },
+    {
+      "id": 5,
+      "name": "Run 60 min",
+      "pointValue": 500,
+      "lastUsed": "",
+      "timesUsed": 0,
+      "tags": []
+    },
+    {
+      "id": 6,
+      "name": "Hula Hoop 10 min",
+      "pointValue": 5,
+      "lastUsed": "",
+      "timesUsed": 0,
+      "tags": []
+    },
+    {
+      "id": 7,
+      "name": "Walk around the park",
+      "pointValue": 25,
+      "lastUsed": "",
+      "timesUsed": 0,
+      "tags": []
+    },
+    {
+      "id": 8,
+      "name": "Calisthenics 10 min",
+      "pointValue": 50,
+      "lastUsed": "",
+      "timesUsed": 0,
+      "tags": []
+    },
+    {
+      "id": 9,
+      "name": "Casual Yoga 15 min",
+      "pointValue": 25,
+      "lastUsed": "",
+      "timesUsed": 0,
+      "tags": []
+    },
+    {
+      "id": 10,
+      "name": "Mysore Yoga 60 min",
+      "pointValue": 150,
+      "lastUsed": "",
+      "timesUsed": 0,
+      "tags": []
+    },
+    {
+      "id": 11,
+      "name": "Walk 1 mile",
+      "pointValue": 125,
+      "lastUsed": "",
+      "timesUsed": 0,
+      "tags": []
+    },
+    {
+      "id": 12,
+      "name": "Retrofit class",
+      "pointValue": 400,
+      "lastUsed": "",
+      "timesUsed": 0,
+      "tags": []
+    }
+  ]
