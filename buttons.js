@@ -53,6 +53,18 @@ function populateTab(tabId, fileName, functionName){
 
 function loadJSON(fileName) {
     try {
+        const xhr = new XMLHttpRequest();
+        xhr.open("GET", fileName, false); // `false` makes the request synchronous
+        xhr.send(null);
+
+        if (xhr.status === 200) {
+            return JSON.parse(xhr.responseText);
+        } else {
+            console.error("Error loading JSON:", xhr.statusText);
+            return null;
+        }
+        
+        /*async version
         const response = fetch(fileName);
         if (!response.ok) {
             throw new Error(`Failed to load JSON: ${response.statusText}`);
@@ -60,6 +72,7 @@ function loadJSON(fileName) {
         const jsonData = response.json(); 
         
         return jsonData
+        */
 
     } catch (error) {
         console.error('Error loading JSON:', error);
