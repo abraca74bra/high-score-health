@@ -18,32 +18,36 @@ function onLoad() {
 function populateTab(tabId, fileName, functionName){
     console.log('Retrieving data from ' + fileName);
     
-    var content = loadJSON(fileName);
-    console.log(content);
-    if(!content){
-        console.log('No content');
-        return
-    }
-
-    if(typeof content == 'object'){
-        throw new Error('Loaded data is not in object format.');
-    }
-
-    var tab = document.getElementById(tabId);
-
-    for(widgetId in content){
-        var widgetData = content[widgetId];
-        
-        //Create the widget element
-        var widgetHTML = `
-            <div class="widget" onclick="${functionName}(${fileName},${widgetId})">
-                <div class="title">${widgetData.name}</div>
-                <div class="number">${widgetData.pointValue}</div>
-            </div>
-        `;
-
-        //Append the to the tab
-        tab.appendChild(widgetHTML);
+    try{
+        var content = loadJSON(fileName);
+        console.log(content);
+        if(!content){
+            console.log('No content');
+            return
+        }
+    
+        if(typeof content == 'object'){
+            throw new Error('Loaded data is not in object format.');
+        }
+    
+        var tab = document.getElementById(tabId);
+    
+        for(widgetId in content){
+            var widgetData = content[widgetId];
+            
+            //Create the widget element
+            var widgetHTML = `
+                <div class="widget" onclick="${functionName}(${fileName},${widgetId})">
+                    <div class="title">${widgetData.name}</div>
+                    <div class="number">${widgetData.pointValue}</div>
+                </div>
+            `;
+    
+            //Append the to the tab
+            tab.appendChild(widgetHTML);
+        }
+    } catch (error) {
+        console.error('Error populating tab:', error);
     }
 }
 
