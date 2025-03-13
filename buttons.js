@@ -47,13 +47,13 @@ function populateTab(tabId, fileName, functionName){
     }
 }
 
-async function loadJSON(fileName) {
+function loadJSON(fileName) {
     try {
-        const response = await fetch(fileName);
+        const response = fetch(fileName);
         if (!response.ok) {
             throw new Error(`Failed to load JSON: ${response.statusText}`);
         }
-        const jsonData = await response.json(); 
+        const jsonData = response.json(); 
         
         return jsonData
 
