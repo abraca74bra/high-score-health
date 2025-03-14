@@ -15,11 +15,11 @@ function onLoad() {
     populateTab("History", "history.json", "view_history");
 }
 
-function populateTab(tabId, fileName, functionName){
+async function populateTab(tabId, fileName, functionName){
     console.log('Retrieving data from ' + fileName);
     
     try{
-        var content = loadJSON(fileName);
+        var content = await loadJSON(fileName);
         console.log(content);
         if(!content){
             console.log('No content');
@@ -51,28 +51,16 @@ function populateTab(tabId, fileName, functionName){
     }
 }
 
-function loadJSON(fileName) {
+async function loadJSON(fileName) {
     try {
-        const xhr = new XMLHttpRequest();
-        xhr.open("GET", fileName, false); // `false` makes the request synchronous
-        xhr.send(null);
-
-        if (xhr.status === 200) {
-            return JSON.parse(xhr.responseText);
-        } else {
-            console.error("Error loading JSON:", xhr.statusText);
-            return null;
-        }
         
-        /*async version
-        const response = fetch(fileName);
+        const response = await fetch(fileName);
         if (!response.ok) {
             throw new Error(`Failed to load JSON: ${response.statusText}`);
         }
-        const jsonData = response.json(); 
+        const jsonData = await response.json(); 
         
         return jsonData
-        */
 
     } catch (error) {
         console.error('Error loading JSON:', error);
