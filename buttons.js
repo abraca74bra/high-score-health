@@ -102,7 +102,7 @@ function addPoints(pointsToAdd) {
     localStorage.setItem("headerTotal", runningTotal);
 }
 
-function addPoints(evt) {
+function addCustomPoints(evt) {
 
     //Get the value from the input field
     var pointsInput = document.getElementById("add_points_input");
@@ -117,7 +117,7 @@ function addPoints(evt) {
     pointsInput.value = '';
 }
 
-function subtractPoints(evt) {
+function subtractCustomPoints(evt) {
     //Get the value from the input field
     var pointsInput = document.getElementById("subtract_points_input");
     var pointsToSubtract = Math.abs(parseFloat(pointsInput.value));
