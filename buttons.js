@@ -27,7 +27,7 @@ async function populateTab(tabId, fileName, functionName){
         }
     
         if(typeof content == 'object'){
-            throw new Error('Loaded data is not in object format.');
+            throw new Error('Loaded data is not in object format. Type is ' + typeof content);
         }
     
         var tab = document.getElementById(tabId);
