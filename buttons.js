@@ -26,7 +26,7 @@ async function populateTab(tabId, fileName, functionName){
             return
         }
     
-        if(typeof content == 'object'){
+        if(typeof content != 'object'){
             throw new Error('Loaded data is not in object format. Type is ' + typeof content);
         }
     
