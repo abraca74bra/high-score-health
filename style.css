@@ -84,3 +84,40 @@ button {
     border: 1px solid #ccc;
     border-top: none;
 }
+
+.widget {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background-color: white;
+    border: 1px solid #ccc; /* Thin outline */
+    border-radius: 10px; /* Rounded corners */
+    font-family: 'Roboto', sans-serif;
+    transition: transform 0.2s ease-in-out;
+}
+
+/* Hover effect */
+.widget:hover {
+    background-color: lightyellow;
+    box-shadow: 3px 3px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Title styling */
+.widget .title {
+    font-size: 14px;
+}
+
+/* Number styling (default) */
+.widget .value {
+    font-size: 14px;
+    font-weight: 700; /*bold*/
+}
+
+#Earn .widget .value {
+    color: green;
+}
+
+#Redeem .widget .value {
+    color: orange;
+}
