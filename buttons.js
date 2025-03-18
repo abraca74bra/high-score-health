@@ -47,7 +47,7 @@ async function populateTab(tabId, fileName, functionName) {
             `;
 
             // Attach event listener
-            widget.addEventListener("click", () => functionName(data.fileName, data.widgetId));
+            widget.addEventListener("click", () => functionName(fileName, widgetId));
 
             // Append to the fragment (not the DOM yet)
             fragment.appendChild(widget);
