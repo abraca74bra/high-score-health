@@ -10,9 +10,9 @@ function onLoad() {
     var headerTotal = document.getElementById("header_total");
     headerTotal.innerHTML = runningTotal;
 
-    populateTab("Earn", "earn.json", "earn_preset");
-    populateTab("Redeem", "redeem.json", "redeem_preset");
-    populateTab("History", "history.json", "view_history");
+    populateTab("Earn", "earn.json", earn_preset);
+    populateTab("Redeem", "redeem.json", redeem_preset);
+    populateTab("History", "history.json", view_history);
 }
 
 async function populateTab(tabId, fileName, functionName) {
@@ -157,7 +157,7 @@ function resetPoints(evt) {
     localStorage.setItem("headerTotal", resetTotal);
 }
 
-function earn_present(fileName, entryId) {
+function earn_preset(fileName, entryId) {
 
     //Get the entry from the file
     var content = loadJSON(fileName);
