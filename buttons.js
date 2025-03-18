@@ -49,12 +49,12 @@ async function populateTab(tabId, fileName, functionName) {
             // Attach event listener
             widget.addEventListener("click", () => functionName(fileName, widgetId));
 
-            // Append to the fragment (not the DOM yet)
+            // Append to the fragment
             fragment.appendChild(widget);
         }
 
-        // Append all elements at once (only one reflow)
-        container.appendChild(fragment);
+        // Append all elements at once to the DOM
+        tab.appendChild(fragment);
 
     } catch (error) {
         console.error('Error populating tab:', error);
