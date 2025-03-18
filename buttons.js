@@ -157,10 +157,10 @@ function resetPoints(evt) {
     localStorage.setItem("headerTotal", resetTotal);
 }
 
-function earn_preset(fileName, entryId) {
+async function earn_preset(fileName, entryId) {
 
     //Get the entry from the file
-    var content = loadJSON(fileName);
+    var content = await loadJSON(fileName);
 
     var entry = content[entryId];
 
@@ -169,15 +169,15 @@ function earn_preset(fileName, entryId) {
     //Can't do file updates (for history or use count) until we have a backend
 }
 
-function redeem_preset(fileName, entryId) {
+async function redeem_preset(fileName, entryId) {
     //Get the entry from the file
-    var content = loadJSON(fileName);
+    var content = await loadJSON(fileName);
 
     var entry = content[entryId];
 
     addPoints(entry.pointValue * -1);
 }
 
-function view_history(entryId) {
+async function view_history(fileName, entryId) {
 
 }
