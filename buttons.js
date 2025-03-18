@@ -15,37 +15,47 @@ function onLoad() {
     populateTab("History", "history.json", "view_history");
 }
 
-async function populateTab(tabId, fileName, functionName){
+async function populateTab(tabId, fileName, functionName) {
     console.log('Retrieving data from ' + fileName);
-    
-    try{
+
+    try {
         var content = await loadJSON(fileName);
         console.log(content);
-        if(!content){
+        if (!content) {
             console.log('No content');
             return
         }
-    
-        if(typeof content != 'object'){
+
+        if (typeof content != 'object') {
             throw new Error('Loaded data is not in object format. Type is ' + typeof content);
         }
-    
+
         var tab = document.getElementById(tabId);
-    
-        for(widgetId in content){
+
+        // Create a document fragment to batch updates
+        const fragment = document.createDocumentFragment();
+
+        for (var widgetId in content) {
             var widgetData = content[widgetId];
-            
-            //Create the widget element
-            var widgetHTML = `
-                <div class="widget" onclick="${functionName}(${fileName},${widgetId})">
-                    <div class="title">${widgetData.name}</div>
-                    <div class="number">${widgetData.pointValue}</div>
-                </div>
+
+            // Create the element
+            const widget = document.createElement("div");
+            widget.className = "widget";
+            widget.innerHTML = `
+            <div class="title">${widgetData.name}</div>
+            <div class="value">${widgetData.pointValue}</div>
             `;
-    
-            //Append the to the tab
-            tab.appendChild(widgetHTML);
+
+            // Attach event listener
+            widget.addEventListener("click", () => functionName(data.fileName, data.widgetId));
+
+            // Append to the fragment (not the DOM yet)
+            fragment.appendChild(widget);
         }
+
+        // Append all elements at once (only one reflow)
+        container.appendChild(fragment);
+
     } catch (error) {
         console.error('Error populating tab:', error);
     }
@@ -53,13 +63,13 @@ async function populateTab(tabId, fileName, functionName){
 
 async function loadJSON(fileName) {
     try {
-        
+
         const response = await fetch(fileName);
         if (!response.ok) {
             throw new Error(`Failed to load JSON: ${response.statusText}`);
         }
-        const jsonData = await response.json(); 
-        
+        const jsonData = await response.json();
+
         return jsonData
 
     } catch (error) {
@@ -147,19 +157,19 @@ function resetPoints(evt) {
     localStorage.setItem("headerTotal", resetTotal);
 }
 
-function earn_present(fileName, entryId){
-    
+function earn_present(fileName, entryId) {
+
     //Get the entry from the file
     var content = loadJSON(fileName);
 
     var entry = content[entryId];
 
     addPoints(entry.pointValue);
-    
+
     //Can't do file updates (for history or use count) until we have a backend
 }
 
-function redeem_preset(fileName, entryId){
+function redeem_preset(fileName, entryId) {
     //Get the entry from the file
     var content = loadJSON(fileName);
 
@@ -168,6 +178,6 @@ function redeem_preset(fileName, entryId){
     addPoints(entry.pointValue * -1);
 }
 
-function view_history(entryId){
+function view_history(entryId) {
 
 }
