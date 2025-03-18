@@ -1,70 +1,70 @@
 {
   "1": {
     "name": "Kombucha",
-    "Points": 10,
+    "pointValue": 10,
     "lastUsed": "",
     "timesUsed": 0,
     "tags": []
   },
   "2": {
     "name": "Fresh Fruit",
-    "Points": 25,
+    "pointValue": 25,
     "lastUsed": "",
     "timesUsed": 0,
     "tags": []
   },
   "3": {
     "name": "Juice",
-    "Points": 50,
+    "pointValue": 50,
     "lastUsed": "",
     "timesUsed": 0,
     "tags": []
   },
   "4": {
     "name": "Cookie",
-    "Points": 80,
+    "pointValue": 80,
     "lastUsed": "",
     "timesUsed": 0,
     "tags": []
   },
   "5": {
     "name": "Hot Chocolate",
-    "Points": 100,
+    "pointValue": 100,
     "lastUsed": "",
     "timesUsed": 0,
     "tags": []
   },
   "6": {
     "name": "Wine",
-    "Points": 120,
+    "pointValue": 120,
     "lastUsed": "",
     "timesUsed": 0,
     "tags": []
   },
   "7": {
     "name": "Whiskey",
-    "Points": 140,
+    "pointValue": 150,
     "lastUsed": "",
     "timesUsed": 0,
     "tags": []
   },
   "8": {
     "name": "Cocktail",
-    "Points": 250,
+    "pointValue": 250,
     "lastUsed": "",
     "timesUsed": 0,
     "tags": []
   },
   "9": {
     "name": "Ice Cream",
-    "Points": 250,
+    "pointValue": 250,
     "lastUsed": "",
     "timesUsed": 0,
     "tags": []
   },
   "10": {
     "name": "Pizza",
-    "Points": 350,
+    "pointValue": 350,
     "lastUsed": "",
     "timesUsed": 0,
     "tags": []
