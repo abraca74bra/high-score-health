@@ -15,7 +15,7 @@ function onLoad() {
     populateTab("History", "history.json", view_history);
 }
 
-async function populateTab(tabId, fileName, functionName) {
+async function populateTab(tabId, fileName, onClickFunction) {
     console.log('Retrieving data from ' + fileName);
 
     try {
@@ -41,13 +41,14 @@ async function populateTab(tabId, fileName, functionName) {
             // Create the element
             const widget = document.createElement("div");
             widget.className = "widget";
+            widget.id = tabId + "_" + widgetId;
             widget.innerHTML = `
             <div class="title">${widgetData.name}</div>
             <div class="value">${widgetData.pointValue}</div>
             `;
 
             // Attach event listener
-            widget.addEventListener("click", () => functionName(fileName, widgetId));
+            widget.addEventListener("click", ((id) => () => onClickFunction(fileName, id))(widgetId));
 
             // Append to the fragment
             fragment.appendChild(widget);
