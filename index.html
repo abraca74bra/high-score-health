@@ -6,63 +6,78 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>High Score Health Point Tracker</title>
     <link rel="stylesheet" href="style.css" />
-    <script src="buttons.js" type="text/javascript"></script>
 </head>
 
 <body>
-    <header>
-
-    </header>
-    <section class="hero">
-        <div class="container">
-            <div class="hero-text">Your Points</div>
-            <div class="hero-counter" id="header_total">0</div>
+    <div id="app">
+        <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+        <script src="app.js"></script>
+        <header>
+            
+        </header>
+        <section class="hero">
+            <div class="container">
+                <div class="hero-text">Your Points</div>
+                <div class="hero-counter">{{ headerTotal }}</div>
+            </div>
+        </section>
+        <!-- Tab links -->
+        <div class="tab">
+            <button class="tablinks" :class="{ active: activeTab === 'Earn' }" @click="openTab('Earn')">Earn</button>
+            <button class="tablinks" :class="{ active: activeTab === 'Redeem' }" @click="openTab('Redeem')">Redeem</button>
+            <button class="tablinks" :class="{ active: activeTab === 'Goals' }" @click="openTab('Goals')">Goals</button>
+            <button class="tablinks" :class="{ active: activeTab === 'Achievements' }" @click="openTab('Achievements')">Achievements</button>
+            <button class="tablinks" :class="{ active: activeTab === 'History' }" @click="openTab('History')">History</button>
         </div>
-    </section>
-    <!-- Tab links -->
-    <div class="tab">
-        <button class="tablinks" onclick="openTab(event, 'Earn')">Earn</button>
-        <button class="tablinks" onclick="openTab(event, 'Redeem')">Redeem</button>
-        <button class="tablinks" onclick="openTab(event, 'Goals')">Goals</button>
-        <button class="tablinks" onclick="openTab(event, 'Achievements')">Achievements</button>
-        <button class="tablinks" onclick="openTab(event, 'History')">History</button>
-    </div>
 
-    <!-- Tab content -->
-    <div id="Earn" class="tabcontent">
-        <h3>Claim Points</h3>
-        <div class = "container">
-            <label for="add_points_input">Custom</label>
-            <input type="number" id="add_points_input" name="add_points_input">
-            <button class="control" id="add_points_button" onclick="addCustomPoints(event)"><img src="plus-circle.png" height="25px" width="25px"></button>
+        <!-- Tab content -->
+        <div v-show="activeTab === 'Earn'" class="tabcontent">
+            <h3>Claim Points</h3>
+            <div class="container">
+                <label for="add_points_input">Custom</label>
+                <input type="number" v-model.number="addPointsInput" @keyup.enter="addCustomPoints">
+                <button class="control" @click="addCustomPoints"><img src="plus-circle.png" height="25px" width="25px"></button>
+            </div>
+            <div v-for="(widget, id) in earnData" :key="id" class="widget" @click="earnPreset(id)">
+                <div class="title">{{ widget.name }}</div>
+                <div class="value">{{ widget.pointValue }}</div>
+            </div>
         </div>
-    </div>
 
-    <div id="Redeem" class="tabcontent">
-        <h3>Spend Points</h3>
-        <div class = "container">
-            <label for="subtract_points_input">Custom</label>
-            <input type="number" id="subtract_points_input" name="subtract_points_input">
-            <button class="control" id="subtract_points_button" onclick="subtractCustomPoints(event)"><img src="minus-circle.png" height="25px" width="25px"></button>
+        <div v-show="activeTab === 'Redeem'" class="tabcontent">
+            <h3>Spend Points</h3>
+            <div class="container">
+                <label for="subtract_points_input">Custom</label>
+                <input type="number" v-model.number="subtractPointsInput" @keyup.enter="subtractCustomPoints">
+                <button class="control" @click="subtractCustomPoints"><img src="minus-circle.png" height="25px" width="25px"></button>
+            </div>
+            <div v-for="(widget, id) in redeemData" :key="id" class="widget" @click="redeemPreset(id)">
+                <div class="title">{{ widget.name }}</div>
+                <div class="value">{{ widget.pointValue }}</div>
+            </div>
         </div>
-    </div>
 
-    <div id="Goals" class="tabcontent">
-        <h3>Reminders to save up points for upcoming events</h3>
-        <p>Content coming soon</p>
-    </div>
+        <div v-show="activeTab === 'Goals'" class="tabcontent">
+            <h3>Reminders to save up points for upcoming events</h3>
+            <p>Content coming soon</p>
+        </div>
 
-    <div id="Achievements" class="tabcontent">
-        <h3>Achievements</h3>
-        <p>Content coming soon</p>
-    </div>
+        <div v-show="activeTab === 'Achievements'" class="tabcontent">
+            <h3>Achievements</h3>
+            <p>Content coming soon</p>
+        </div>
 
-    <div id="History" class="tabcontent">
-        <h3>Points Earned and Redeemed</h3>
-        <div class = "container">
-            <label>Reset Points Total</label>
-            <input type="number" id="reset_points_input">
-            <button class="control" id="reset_points_button" onclick="resetPoints(event)"><img src="minus-circle.png" height="25px" width="25px"></button>
+        <div v-show="activeTab === 'History'" class="tabcontent">
+            <h3>Points Earned and Redeemed</h3>
+            <div class="container">
+                <label>Reset Points Total</label>
+                <input type="number" v-model.number="resetPointsInput" @keyup.enter="resetPoints">
+                <button class="control" @click="resetPoints"><img src="minus-circle.png" height="25px" width="25px"></button>
+            </div>
+            <div v-for="(widget, id) in historyData" :key="id" class="widget" @click="viewHistory(id)">
+                <div class="title">{{ widget.name }}</div>
+                <div class="value">{{ widget.pointValue }}</div>
+            </div>
         </div>
         <p>Content coming soon</p>
     </div>
