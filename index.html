@@ -10,8 +10,6 @@
 
 <body>
     <div id="app">
-        <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-        <script src="app.js"></script>
         <header>
             
         </header>
@@ -36,7 +34,7 @@
             <div class="container">
                 <label for="add_points_input">Custom</label>
                 <input type="number" v-model.number="addPointsInput" @keyup.enter="addCustomPoints">
-                <button class="control" @click="addCustomPoints"><img src="plus-circle.png" height="25px" width="25px"></button>
+                <button class="control" @click="addCustomPoints"><img src="icons/plus-circle.png" height="25px" width="25px"></button>
             </div>
             <div v-for="(widget, id) in earnData" :key="id" class="widget" @click="earnPreset(id)">
                 <div class="title">{{ widget.name }}</div>
@@ -49,7 +47,7 @@
             <div class="container">
                 <label for="subtract_points_input">Custom</label>
                 <input type="number" v-model.number="subtractPointsInput" @keyup.enter="subtractCustomPoints">
-                <button class="control" @click="subtractCustomPoints"><img src="minus-circle.png" height="25px" width="25px"></button>
+                <button class="control" @click="subtractCustomPoints"><img src="icons/minus-circle.png" height="25px" width="25px"></button>
             </div>
             <div v-for="(widget, id) in redeemData" :key="id" class="widget" @click="redeemPreset(id)">
                 <div class="title">{{ widget.name }}</div>
@@ -72,15 +70,17 @@
             <div class="container">
                 <label>Reset Points Total</label>
                 <input type="number" v-model.number="resetPointsInput" @keyup.enter="resetPoints">
-                <button class="control" @click="resetPoints"><img src="minus-circle.png" height="25px" width="25px"></button>
+                <button class="control" @click="resetPoints"><img src="icons/minus-circle.png" height="25px" width="25px"></button>
             </div>
             <div v-for="(widget, id) in historyData" :key="id" class="widget" @click="viewHistory(id)">
                 <div class="title">{{ widget.name }}</div>
                 <div class="value">{{ widget.pointValue }}</div>
             </div>
         </div>
-        <p>Content coming soon</p>
     </div>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script type="module" src="app.js"></script>
 </body>
 
 </html>

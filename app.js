@@ -1,3 +1,5 @@
+import { db, collection, getDocs, doc, getDoc, setDoc, updateDoc } from './firebaseConfig.js';
+
 const { createApp } = Vue;
 
 createApp({
@@ -14,41 +16,67 @@ createApp({
         }
     },
     async mounted() {
-        // Get the cached value of the header total
-        const runningTotal = localStorage.getItem('headerTotal');
-        this.headerTotal = runningTotal ? parseFloat(runningTotal) : 0;
+        // Get the cached value of the header total from Firestore
+        await this.loadHeaderTotal();
 
         // Load data for all tabs
         await this.loadTabData();
     },
     methods: {
+        async loadHeaderTotal() {
+            try {
+                const docRef = doc(db, 'user', 'currentUser');
+                const docSnap = await getDoc(docRef);
+                
+                if (docSnap.exists()) {
+                    this.headerTotal = docSnap.data().headerTotal || 0;
+                } else {
+                    // Initialize if doesn't exist
+                    this.headerTotal = 0;
+                    await setDoc(docRef, { headerTotal: 0 });
+                }
+            } catch (error) {
+                console.error('Error loading header total:', error);
+                // Fallback to localStorage
+                const runningTotal = localStorage.getItem('headerTotal');
+                this.headerTotal = runningTotal ? parseFloat(runningTotal) : 0;
+            }
+        },
         async loadTabData() {
             try {
-                this.earnData = await this.loadJSON('earn.json');
-                this.redeemData = await this.loadJSON('redeem.json');
-                this.historyData = await this.loadJSON('history.json');
+                this.earnData = await this.loadCollection('earn');
+                this.redeemData = await this.loadCollection('redeem');
+                this.historyData = await this.loadCollection('history');
             } catch (error) {
                 console.error('Error loading tab data:', error);
             }
         },
-        async loadJSON(fileName) {
+        async loadCollection(collectionName) {
             try {
-                const response = await fetch(fileName);
-                if (!response.ok) {
-                    throw new Error(`Failed to load JSON: ${response.statusText}`);
-                }
-                const jsonData = await response.json();
-                return jsonData;
+                const querySnapshot = await getDocs(collection(db, collectionName));
+                const data = {};
+                querySnapshot.forEach((doc) => {
+                    data[doc.id] = doc.data();
+                });
+                return data;
             } catch (error) {
-                console.error('Error loading JSON:', error);
+                console.error(`Error loading ${collectionName}:`, error);
                 return {};
             }
         },
         openTab(tabName) {
             this.activeTab = tabName;
         },
-        addPoints(pointsToAdd) {
+        async addPoints(pointsToAdd) {
             this.headerTotal += pointsToAdd;
+            
+            // Save to both Firestore and localStorage
+            try {
+                const docRef = doc(db, 'user', 'currentUser');
+                await updateDoc(docRef, { headerTotal: this.headerTotal });
+            } catch (error) {
+                console.error('Error updating Firestore:', error);
+            }
             localStorage.setItem("headerTotal", this.headerTotal);
         },
         addCustomPoints() {
@@ -67,12 +95,20 @@ createApp({
             this.addPoints(pointsToSubtract * -1);
             this.subtractPointsInput = null;
         },
-        resetPoints() {
+        async resetPoints() {
             const resetTotal = parseFloat(this.resetPointsInput);
             if (!resetTotal && resetTotal !== 0) {
                 return;
             }
             this.headerTotal = resetTotal;
+            
+            // Save to both Firestore and localStorage
+            try {
+                const docRef = doc(db, 'user', 'currentUser');
+                await updateDoc(docRef, { headerTotal: resetTotal });
+            } catch (error) {
+                console.error('Error updating Firestore:', error);
+            }
             localStorage.setItem("headerTotal", resetTotal);
             this.resetPointsInput = null;
         },
@@ -80,7 +116,6 @@ createApp({
             const entry = this.earnData[entryId];
             if (entry) {
                 this.addPoints(entry.pointValue);
-                // Can't do file updates (for history or use count) until we have a backend
             }
         },
         redeemPreset(entryId) {
