@@ -8,7 +8,7 @@ createApp({
             currentUser: null,
             availableUsers: ['angelab', 'test'],
             showUserSelector: false,
-            headerTotal: 0,
+            headerTotal: null,
             activeTab: 'Earn',
             earnData: {},
             redeemData: {},
