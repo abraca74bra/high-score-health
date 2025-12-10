@@ -11,7 +11,22 @@
 <body>
     <div id="app">
         <header>
-            
+            <div class="user-selector-container">
+                <button @click="toggleUserSelector" class="user-button">
+                    User: {{ currentUser }}
+                </button>
+                <div v-if="showUserSelector" class="user-dropdown">
+                    <button 
+                        v-for="user in availableUsers" 
+                        :key="user"
+                        @click="selectUser(user)"
+                        :class="{ active: user === currentUser }"
+                        class="user-option"
+                    >
+                        {{ user }}
+                    </button>
+                </div>
+            </div>
         </header>
         <section class="hero">
             <div class="container">

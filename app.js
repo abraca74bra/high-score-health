@@ -5,6 +5,9 @@ const { createApp } = Vue;
 createApp({
     data() {
         return {
+            currentUser: null,
+            availableUsers: ['angelab', 'test'],
+            showUserSelector: false,
             headerTotal: 0,
             activeTab: 'Earn',
             earnData: {},
@@ -16,24 +19,55 @@ createApp({
         }
     },
     async mounted() {
-        // Get the cached value of the header total from Firestore
+        // Load the current user from localStorage
+        await this.loadCurrentUser();
+        
+        // Get the user's point total from Firestore
         await this.loadHeaderTotal();
 
         // Load data for all tabs
         await this.loadTabData();
     },
     methods: {
+        async loadCurrentUser() {
+            // Get user from localStorage or default to first user
+            const storedUser = localStorage.getItem('currentUser');
+            if (storedUser && this.availableUsers.includes(storedUser)) {
+                this.currentUser = storedUser;
+            } else {
+                this.currentUser = this.availableUsers[0];
+                localStorage.setItem('currentUser', this.currentUser);
+            }
+        },
+        selectUser(username) {
+            this.currentUser = username;
+            localStorage.setItem('currentUser', username);
+            this.showUserSelector = false;
+            
+            // Reload user-specific data
+            this.loadHeaderTotal();
+            this.loadHistoryData();
+        },
+        toggleUserSelector() {
+            this.showUserSelector = !this.showUserSelector;
+        },
         async loadHeaderTotal() {
+            if (!this.currentUser) return;
+            
             try {
-                const docRef = doc(db, 'user', 'currentUser');
+                const docRef = doc(db, 'users', this.currentUser);
                 const docSnap = await getDoc(docRef);
                 
                 if (docSnap.exists()) {
-                    this.headerTotal = docSnap.data().headerTotal || 0;
+                    this.headerTotal = docSnap.data().currentTotal || 0;
                 } else {
                     // Initialize if doesn't exist
                     this.headerTotal = 0;
-                    await setDoc(docRef, { headerTotal: 0 });
+                    await setDoc(docRef, { 
+                        currentTotal: 0,
+                        username: this.currentUser,
+                        createdAt: new Date().toISOString()
+                    });
                 }
             } catch (error) {
                 console.error('Error loading header total:', error);
@@ -44,11 +78,27 @@ createApp({
         },
         async loadTabData() {
             try {
-                this.earnData = await this.loadCollection('earn');
-                this.redeemData = await this.loadCollection('redeem');
-                this.historyData = await this.loadCollection('history');
+                this.earnData = await this.loadCollection('activities');
+                this.redeemData = await this.loadCollection('rewards');
+                await this.loadHistoryData();
             } catch (error) {
                 console.error('Error loading tab data:', error);
+            }
+        },
+        async loadHistoryData() {
+            if (!this.currentUser) return;
+            
+            try {
+                const historyRef = collection(db, 'users', this.currentUser, 'history');
+                const querySnapshot = await getDocs(historyRef);
+                const data = {};
+                querySnapshot.forEach((doc) => {
+                    data[doc.id] = doc.data();
+                });
+                this.historyData = data;
+            } catch (error) {
+                console.error('Error loading history:', error);
+                this.historyData = {};
             }
         },
         async loadCollection(collectionName) {
@@ -68,12 +118,17 @@ createApp({
             this.activeTab = tabName;
         },
         async addPoints(pointsToAdd) {
+            if (!this.currentUser) {
+                alert('Error: No user selected. Please select a user first.');
+                return;
+            }
+            
             this.headerTotal += pointsToAdd;
             
-            // Save to both Firestore and localStorage
+            // Save to Firestore and localStorage
             try {
-                const docRef = doc(db, 'user', 'currentUser');
-                await updateDoc(docRef, { headerTotal: this.headerTotal });
+                const docRef = doc(db, 'users', this.currentUser);
+                await updateDoc(docRef, { currentTotal: this.headerTotal });
             } catch (error) {
                 console.error('Error updating Firestore:', error);
             }
@@ -96,16 +151,18 @@ createApp({
             this.subtractPointsInput = null;
         },
         async resetPoints() {
+            if (!this.currentUser) return;
+            
             const resetTotal = parseFloat(this.resetPointsInput);
             if (!resetTotal && resetTotal !== 0) {
                 return;
             }
             this.headerTotal = resetTotal;
             
-            // Save to both Firestore and localStorage
+            // Save to Firestore and localStorage
             try {
-                const docRef = doc(db, 'user', 'currentUser');
-                await updateDoc(docRef, { headerTotal: resetTotal });
+                const docRef = doc(db, 'users', this.currentUser);
+                await updateDoc(docRef, { currentTotal: resetTotal });
             } catch (error) {
                 console.error('Error updating Firestore:', error);
             }
@@ -114,13 +171,19 @@ createApp({
         },
         earnPreset(entryId) {
             const entry = this.earnData[entryId];
-            if (entry) {
+            if (entry && entry.pointsByUnit) {
+                // For now, use the first available point value
+                // TODO: Implement UI for selecting time/unit
+                const firstUnit = Object.keys(entry.pointsByUnit)[0];
+                const points = entry.pointsByUnit[firstUnit];
+                this.addPoints(points);
+            } else if (entry && entry.pointValue) {
                 this.addPoints(entry.pointValue);
             }
         },
         redeemPreset(entryId) {
             const entry = this.redeemData[entryId];
-            if (entry) {
+            if (entry && entry.pointValue) {
                 this.addPoints(entry.pointValue * -1);
             }
         },
