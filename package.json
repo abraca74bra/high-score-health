@@ -1,5 +1,9 @@
 {
+  "type": "module",
   "dependencies": {
     "firebase": "^12.6.0"
+  },
+  "scripts": {
+    "upload": "node uploadToFirestore.js"
   }
 }

@@ -1,4 +1,4 @@
-import { db, collection, doc, setDoc, addDoc } from './firebaseConfig.js';
+import { db, collection, doc, setDoc, addDoc } from './firebaseConfig.node.js';
 
 // Your local JSON data
 const earnData = {
@@ -45,9 +45,11 @@ async function uploadData() {
       console.log(`Uploaded redeem item with auto-ID: ${docRef.id}`);
     }
 
-    console.log('Upload complete');
+    console.log('\nUpload complete! You can now close this script.');
+    process.exit(0);
   } catch (error) {
     console.error('Error uploading data:', error);
+    process.exit(1);
   }
 }
 
