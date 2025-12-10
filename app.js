@@ -15,7 +15,9 @@ createApp({
             historyData: {},
             addPointsInput: null,
             subtractPointsInput: null,
-            resetPointsInput: null
+            resetPointsInput: null,
+            showIndoor: true,
+            showOutdoor: true
         }
     },
     async mounted() {
@@ -189,6 +191,23 @@ createApp({
         },
         viewHistory(entryId) {
             // Placeholder for future functionality
+        }
+    },
+    computed: {
+        filteredEarnData() {
+            if (!this.earnData) return {};
+            
+            const filtered = {};
+            for (const [id, activity] of Object.entries(this.earnData)) {
+                const isOutdoor = activity.outdoors === true;
+                const isIndoor = activity.outdoors === false;
+                
+                // Show if conditions match
+                if ((isIndoor && this.showIndoor) || (isOutdoor && this.showOutdoor)) {
+                    filtered[id] = activity;
+                }
+            }
+            return filtered;
         }
     }
 }).mount('#app');

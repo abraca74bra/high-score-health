@@ -51,9 +51,29 @@
                 <input type="number" v-model.number="addPointsInput" @keyup.enter="addCustomPoints">
                 <button class="control" @click="addCustomPoints"><img src="icons/plus-circle.png" height="25px" width="25px"></button>
             </div>
-            <div v-for="(widget, id) in earnData" :key="id" class="widget" @click="earnPreset(id)">
+            <div class="container toggle-container">
+                <div class="toggle-group">
+                    <label class="toggle-label">
+                        <span>Indoor</span>
+                        <label class="switch">
+                            <input type="checkbox" v-model="showIndoor">
+                            <span class="slider"></span>
+                        </label>
+                    </label>
+                </div>
+                <div class="toggle-group">
+                    <label class="toggle-label">
+                        <span>Outdoor</span>
+                        <label class="switch">
+                            <input type="checkbox" v-model="showOutdoor">
+                            <span class="slider"></span>
+                        </label>
+                    </label>
+                </div>
+            </div>
+            <div v-for="(widget, id) in filteredEarnData" :key="id" class="widget" @click="earnPreset(id)">
                 <div class="title">{{ widget.name }}</div>
-                <div class="value">{{ widget.pointValue }}</div>
+                <div class="value">{{ widget.pointsByUnit ? Object.values(widget.pointsByUnit)[0] : widget.pointValue }}</div>
             </div>
         </div>
 
