@@ -71,9 +71,14 @@
                     </label>
                 </div>
             </div>
-            <div v-for="(widget, id) in filteredEarnData" :key="id" class="widget" @click="earnPreset(id)">
-                <div class="title">{{ widget.name }}</div>
-                <div class="value">{{ widget.pointsByUnit ? Object.values(widget.pointsByUnit)[0] : widget.pointValue }}</div>
+            <div class="tile-grid">
+                <div v-for="(widget, id) in filteredEarnData" :key="id" class="activity-tile" @click="earnPreset(id)">
+                    <div class="tile-icon">
+                        <!-- TODO: Eventually add icon file reference to each activity in Firebase and use that instead of default icon -->
+                        <img src="icons/exercise_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.png" alt="Exercise icon">
+                    </div>
+                    <div class="tile-name">{{ widget.name }}</div>
+                </div>
             </div>
         </div>
 
@@ -110,6 +115,57 @@
             <div v-for="(widget, id) in historyData" :key="id" class="widget" @click="viewHistory(id)">
                 <div class="title">{{ widget.name }}</div>
                 <div class="value">{{ widget.pointValue }}</div>
+            </div>
+        </div>
+        
+        <!-- Activity Details Popup Modal -->
+        <div v-if="showActivityModal" class="modal-overlay" @click="closeActivityModal">
+            <div class="modal-content" @click.stop>
+                <button class="modal-close" @click="closeActivityModal">&times;</button>
+                <h2>{{ selectedActivity.name }}</h2>
+                
+                <div class="modal-section">
+                    <h3>{{ selectedActivity.unit.charAt(0).toUpperCase() + selectedActivity.unit.slice(1) }}</h3>
+                    <div class="unit-grid">
+                        <div 
+                            v-for="(points, quantity) in selectedActivity.pointsByUnit" 
+                            :key="quantity"
+                            class="unit-tile"
+                            :class="{ selected: selectedQuantity == quantity }"
+                            @click="selectQuantity(quantity)"
+                        >
+                            <div class="unit-amount">{{ quantity }}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div v-if="selectedActivity.intensityModifier" class="modal-section">
+                    <h3>Intensity</h3>
+                    <div class="intensity-slider-container">
+                        <div class="intensity-labels">
+                            <span>Easy</span>
+                            <span>Moderate</span>
+                            <span>Intense</span>
+                        </div>
+                        <input 
+                            type="range" 
+                            min="0" 
+                            max="2" 
+                            step="1" 
+                            v-model.number="selectedIntensity"
+                            class="intensity-slider"
+                        >
+                    </div>
+                </div>
+                
+                <button 
+                    class="claim-button"
+                    :class="{ disabled: !selectedQuantity }"
+                    :disabled="!selectedQuantity"
+                    @click="claimActivityPoints"
+                >
+                    {{ selectedQuantity ? `Claim ${calculatedPoints} points!` : 'Please select the exercise amount' }}
+                </button>
             </div>
         </div>
     </div>

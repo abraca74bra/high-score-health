@@ -17,7 +17,12 @@ createApp({
             subtractPointsInput: null,
             resetPointsInput: null,
             showIndoor: true,
-            showOutdoor: true
+            showOutdoor: true,
+            showActivityModal: false,
+            selectedActivity: null,
+            selectedActivityId: null,
+            selectedQuantity: null,
+            selectedIntensity: 1 // 0=Easy, 1=Moderate, 2=Intense
         }
     },
     async mounted() {
@@ -174,14 +179,34 @@ createApp({
         earnPreset(entryId) {
             const entry = this.earnData[entryId];
             if (entry && entry.pointsByUnit) {
-                // For now, use the first available point value
-                // TODO: Implement UI for selecting time/unit
-                const firstUnit = Object.keys(entry.pointsByUnit)[0];
-                const points = entry.pointsByUnit[firstUnit];
-                this.addPoints(points);
+                // Open modal for activity details
+                this.selectedActivity = entry;
+                this.selectedActivityId = entryId;
+                // Auto-select the first quantity
+                const quantities = Object.keys(entry.pointsByUnit);
+                this.selectedQuantity = quantities.length > 0 ? parseInt(quantities[0]) : null;
+                this.selectedIntensity = 1; // Default to Moderate
+                this.showActivityModal = true;
             } else if (entry && entry.pointValue) {
+                // Legacy: direct point value without options
                 this.addPoints(entry.pointValue);
             }
+        },
+        selectQuantity(quantity) {
+            this.selectedQuantity = quantity;
+        },
+        closeActivityModal() {
+            this.showActivityModal = false;
+            this.selectedActivity = null;
+            this.selectedActivityId = null;
+            this.selectedQuantity = null;
+            this.selectedIntensity = 1;
+        },
+        claimActivityPoints() {
+            if (!this.selectedQuantity) return;
+            
+            this.addPoints(this.calculatedPoints);
+            this.closeActivityModal();
         },
         redeemPreset(entryId) {
             const entry = this.redeemData[entryId];
@@ -208,6 +233,20 @@ createApp({
                 }
             }
             return filtered;
+        },
+        calculatedPoints() {
+            if (!this.selectedActivity || !this.selectedQuantity) return 0;
+            
+            const basePoints = this.selectedActivity.pointsByUnit[this.selectedQuantity];
+            
+            if (this.selectedActivity.intensityModifier) {
+                const intensityKeys = Object.keys(this.selectedActivity.intensityModifier);
+                const intensityKey = intensityKeys[this.selectedIntensity];
+                const modifier = this.selectedActivity.intensityModifier[intensityKey];
+                return Math.round(basePoints * modifier);
+            }
+            
+            return basePoints;
         }
     }
 }).mount('#app');
