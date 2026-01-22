@@ -10,22 +10,69 @@
 
 <body>
     <div id="app" v-cloak>
+        <!-- Login Screen -->
+        <div v-if="!isAuthenticated" class="login-container">
+            <div class="login-box">
+                <h1>High Score Health</h1>
+                <h2>{{ isSignupMode ? 'Create Account' : 'Login' }}</h2>
+                
+                <div v-if="authError" class="auth-error">{{ authError }}</div>
+                
+                <form @submit.prevent="isSignupMode ? handleSignup() : handleLogin()">
+                    <div v-if="isSignupMode" class="form-group">
+                        <label for="displayName">Name</label>
+                        <input 
+                            type="text" 
+                            id="displayName" 
+                            v-model="displayName" 
+                            required
+                            placeholder="Hi, what's your name?"
+                        >
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            v-model="email" 
+                            required
+                            placeholder="Enter your email"
+                        >
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            v-model="password" 
+                            required
+                            placeholder="Enter your password"
+                            minlength="6"
+                        >
+                    </div>
+                    
+                    <button type="submit" class="auth-button">
+                        {{ isSignupMode ? 'Sign Up' : 'Login' }}
+                    </button>
+                </form>
+                
+                <p class="auth-toggle">
+                    {{ isSignupMode ? 'Already have an account?' : "Don't have an account?" }}
+                    <a href="#" @click.prevent="toggleAuthMode">
+                        {{ isSignupMode ? 'Login' : 'Sign Up' }}
+                    </a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Main App -->
+        <div v-if="isAuthenticated">
         <header>
             <div class="user-selector-container">
-                <button @click="toggleUserSelector" class="user-button">
-                    User: {{ currentUser }}
-                </button>
-                <div v-if="showUserSelector" class="user-dropdown">
-                    <button 
-                        v-for="user in availableUsers" 
-                        :key="user"
-                        @click="selectUser(user)"
-                        :class="{ active: user === currentUser }"
-                        class="user-option"
-                    >
-                        {{ user }}
-                    </button>
-                </div>
+                <span class="user-display">{{ userDisplayName }}</span>
+                <button @click="handleSignOut" class="sign-out-button">Sign Out</button>
             </div>
         </header>
         <section class="hero">
@@ -167,6 +214,7 @@
                     {{ selectedQuantity ? `Claim ${calculatedPoints} points!` : 'Please select the exercise amount' }}
                 </button>
             </div>
+        </div>
         </div>
     </div>
 

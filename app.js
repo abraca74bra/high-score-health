@@ -1,13 +1,22 @@
-import { db, collection, getDocs, doc, getDoc, setDoc, updateDoc } from './firebaseConfig.js';
+import { db, auth, collection, getDocs, doc, getDoc, setDoc, updateDoc, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from './firebaseConfig.js';
 
 const { createApp } = Vue;
 
 createApp({
     data() {
         return {
+            // Authentication
+            isAuthenticated: false,
             currentUser: null,
-            availableUsers: ['angelab', 'test'],
-            showUserSelector: false,
+            userEmail: null,
+            userDisplayName: null,
+            email: '',
+            password: '',
+            displayName: '',
+            isSignupMode: false,
+            authError: null,
+            
+            // App data
             headerTotal: null,
             activeTab: 'Earn',
             earnData: {},
@@ -26,37 +35,95 @@ createApp({
         }
     },
     async mounted() {
-        // Load the current user from localStorage
-        await this.loadCurrentUser();
-        
-        // Get the user's point total from Firestore
-        await this.loadHeaderTotal();
-
-        // Load data for all tabs
-        await this.loadTabData();
+        // Set up authentication state listener
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // User is signed in
+                this.isAuthenticated = true;
+                this.currentUser = user.uid;
+                this.userEmail = user.email;
+                
+                // Load user data
+                await this.loadHeaderTotal();
+                await this.loadTabData();
+            } else {
+                // User is signed out
+                this.isAuthenticated = false;
+                this.currentUser = null;
+                this.userEmail = null;
+                this.userDisplayName = null;
+            }
+        });
     },
     methods: {
-        async loadCurrentUser() {
-            // Get user from localStorage or default to first user
-            const storedUser = localStorage.getItem('currentUser');
-            if (storedUser && this.availableUsers.includes(storedUser)) {
-                this.currentUser = storedUser;
-            } else {
-                this.currentUser = this.availableUsers[0];
-                localStorage.setItem('currentUser', this.currentUser);
+        async handleLogin() {
+            this.authError = null;
+            try {
+                await signInWithEmailAndPassword(auth, this.email, this.password);
+                // onAuthStateChanged will handle the rest
+                this.email = '';
+                this.password = '';
+            } catch (error) {
+                console.error('Login error:', error);
+                this.authError = this.getAuthErrorMessage(error.code);
             }
         },
-        selectUser(username) {
-            this.currentUser = username;
-            localStorage.setItem('currentUser', username);
-            this.showUserSelector = false;
-            
-            // Reload user-specific data
-            this.loadHeaderTotal();
-            this.loadHistoryData();
+        async handleSignup() {
+            this.authError = null;
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, this.email, this.password);
+                // Initialize user document in Firestore
+                await setDoc(doc(db, 'users', userCredential.user.uid), {
+                    email: this.email,
+                    displayName: this.displayName,
+                    currentTotal: 0,
+                    createdAt: new Date().toISOString()
+                });
+                this.email = '';
+                this.password = '';
+                this.displayName = '';
+            } catch (error) {
+                console.error('Signup error:', error);
+                this.authError = this.getAuthErrorMessage(error.code);
+            }
         },
-        toggleUserSelector() {
-            this.showUserSelector = !this.showUserSelector;
+        async handleSignOut() {
+            try {
+                await signOut(auth);
+                // Clear local data
+                this.headerTotal = null;
+                this.earnData = {};
+                this.redeemData = {};
+                this.historyData = {};
+                this.userDisplayName = null;
+            } catch (error) {
+                console.error('Sign out error:', error);
+            }
+        },
+        toggleAuthMode() {
+            this.isSignupMode = !this.isSignupMode;
+            this.authError = null;
+            this.displayName = '';
+        },
+        getAuthErrorMessage(errorCode) {
+            switch (errorCode) {
+                case 'auth/invalid-email':
+                    return 'Invalid email address.';
+                case 'auth/user-disabled':
+                    return 'This account has been disabled.';
+                case 'auth/user-not-found':
+                    return 'No account found with this email.';
+                case 'auth/wrong-password':
+                    return 'Incorrect password.';
+                case 'auth/email-already-in-use':
+                    return 'An account with this email already exists.';
+                case 'auth/weak-password':
+                    return 'Password should be at least 6 characters.';
+                case 'auth/invalid-credential':
+                    return 'Invalid email or password.';
+                default:
+                    return 'An error occurred. Please try again.';
+            }
         },
         async loadHeaderTotal() {
             if (!this.currentUser) return;
@@ -67,12 +134,15 @@ createApp({
                 
                 if (docSnap.exists()) {
                     this.headerTotal = docSnap.data().currentTotal || 0;
+                    this.userDisplayName = docSnap.data().displayName || this.userEmail;
                 } else {
                     // Initialize if doesn't exist
                     this.headerTotal = 0;
+                    this.userDisplayName = this.userEmail;
                     await setDoc(docRef, { 
                         currentTotal: 0,
-                        username: this.currentUser,
+                        email: this.userEmail,
+                        displayName: this.userEmail,
                         createdAt: new Date().toISOString()
                     });
                 }
