@@ -328,7 +328,7 @@ createApp({
             const basePoints = this.selectedActivity.pointsByUnit[this.selectedQuantity];
             
             if (this.selectedActivity.intensityModifier) {
-                const intensityKeys = Object.keys(this.selectedActivity.intensityModifier);
+                const intensityKeys = ["Easy", "Moderate", "Intense"];
                 const intensityKey = intensityKeys[this.selectedIntensity];
                 const modifier = this.selectedActivity.intensityModifier[intensityKey];
                 return Math.round(basePoints * modifier);
