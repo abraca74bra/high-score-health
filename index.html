@@ -100,11 +100,6 @@
         <!-- Tab content -->
         <div v-show="activeTab === 'Earn'" class="tabcontent">
             <h3>Claim Points</h3>
-            <div class="container">
-                <label for="add_points_input">Custom</label>
-                <input type="number" v-model.number="addPointsInput" @keyup.enter="addCustomPoints">
-                <button class="control" @click="addCustomPoints"><img src="icons/plus-circle.png" height="25px" width="25px"></button>
-            </div>
             <div class="container toggle-container">
                 <div class="toggle-group">
                     <label class="toggle-label">
@@ -134,18 +129,25 @@
                     <div class="tile-name">{{ widget.name }}</div>
                 </div>
             </div>
+            <!-- Fixed bottom container for custom entry -->
+            <div class="fixed-bottom-container">
+                <div class="custom-points-container">
+                    <button class="custom-input-button" @click="customEntry" style="background-color: #4CAF50;">Custom Activity</button>
+                </div>
+            </div>
         </div>
 
         <div v-show="activeTab === 'Redeem'" class="tabcontent">
             <h3>Spend Points</h3>
-            <div class="container">
-                <label for="subtract_points_input">Custom</label>
-                <input type="number" v-model.number="subtractPointsInput" @keyup.enter="subtractCustomPoints">
-                <button class="control" @click="subtractCustomPoints"><img src="icons/minus-circle.png" height="25px" width="25px"></button>
-            </div>
             <div v-for="(widget, id) in redeemData" :key="id" class="widget" @click="redeemPreset(id)">
                 <div class="title">{{ widget.name }}</div>
                 <div class="value">{{ widget.pointValue }}</div>
+            </div>
+            <!-- Fixed bottom container for custom entry -->
+            <div class="fixed-bottom-container">
+                <div class="custom-points-container">
+                    <button class="custom-input-button" @click="customEntry" style="background-color: #764ba2;">Custom Reward</button>
+                </div>
             </div>
         </div>
 
@@ -161,17 +163,18 @@
 
         <div v-show="activeTab === 'History'" class="tabcontent">
             <h3>Points Earned and Redeemed</h3>
-            <div class="container">
-                <label>Reset Points Total</label>
-                <input type="number" v-model.number="resetPointsInput" @keyup.enter="resetPoints">
-                <button class="control" @click="resetPoints"><img src="icons/minus-circle.png" height="25px" width="25px"></button>
-            </div>
             <div v-for="(widget, id) in historyData" :key="id" class="widget" @click="viewHistory(id)">
                 <div class="title">{{ widget.name }}</div>
                 <div class="value">{{ widget.pointValue }}</div>
             </div>
+            <!-- Fixed bottom container for custom entry -->
+            <div class="fixed-bottom-container">
+                <div class="custom-points-container">
+                    <button class="custom-input-button" @click="customEntry" style="background-color: #667eea;">Reset Point Total</button>
+                </div>
+            </div>
         </div>
-        
+
         <!-- Activity Details Popup Modal -->
         <div v-if="showActivityModal" class="modal-overlay" @click="closeActivityModal">
             <div class="modal-content" @click.stop>
@@ -220,6 +223,64 @@
                 >
                     {{ selectedQuantity ? `Claim ${calculatedPoints} points!` : 'Please select the exercise amount' }}
                 </button>
+            </div>
+        </div>
+
+        <!-- Custom Entry Popup Modal -->
+        <div v-if="showCustomEntryModal" class="modal-overlay" @click="closeCustomEntryModal">
+            <div class="modal-content" @click.stop>
+                <button class="modal-close" @click="closeCustomEntryModal">&times;</button>
+                <h2>Custom {{ customEntryMode }}</h2>
+
+                <div class="modal-section">
+                    <h3>Points</h3>
+                    <input 
+                        type="number" 
+                        v-model.number="customEntryPointValue"
+                    >
+                </div>
+
+                <div class="modal-section">
+                    <h3>Memo</h3>
+                    <input 
+                        type="text" 
+                        v-model="customEntryMemo"
+                    >
+                </div>
+                
+                <div v-if="customEntryMode == 'Activity'" class="modal-section">
+                    <button 
+                        class="claim-button"
+                        :class="{ disabled: !customEntryPointValue }"
+                        :disabled="!customEntryPointValue"
+                        @click="addCustomPoints"
+                    >
+                        {{ !customEntryPointValue ? 'Please enter a point value' : `Claim ${customEntryPointValue} points!` }}
+                    </button>
+                </div>
+                <div v-else-if="customEntryMode == 'Reward'" class="modal-section">
+                    <button 
+                        class="claim-button"
+                        :class="{ disabled: !customEntryPointValue }"
+                        :disabled="!customEntryPointValue"
+                        @click="subtractCustomPoints"
+                    >
+                        {{ !customEntryPointValue ? 'Please enter a point value' : `Redeem ${customEntryPointValue} points!` }}
+                    </button>
+                </div>
+                <div v-else-if="customEntryMode == 'Reset'" class="modal-section">
+                    <button 
+                        class="claim-button"
+                        :class="{ disabled: customEntryPointValue === null }"
+                        :disabled="customEntryPointValue === null"
+                        @click="resetPoints"
+                    >
+                        {{ customEntryPointValue === null ? 'Please enter a point value' : `Reset point total to ${customEntryPointValue}` }}
+                    </button>
+                </div>
+                <div v-else class="modal-section">
+                    <p>Unknown custom entry mode.</p>
+                </div>
             </div>
         </div>
         </div>

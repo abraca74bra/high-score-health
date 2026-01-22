@@ -24,9 +24,10 @@ createApp({
             earnData: {},
             redeemData: {},
             historyData: {},
-            addPointsInput: null,
-            subtractPointsInput: null,
-            resetPointsInput: null,
+            customEntryMode: null,
+            showCustomEntryModal: false,
+            customEntryPointValue: null,
+            customEntryMemo: '',
             showIndoor: true,
             showOutdoor: true,
             showActivityModal: false,
@@ -214,7 +215,7 @@ createApp({
         openTab(tabName) {
             this.activeTab = tabName;
         },
-        async addPoints(pointsToAdd) {
+        async addPoints(pointsToAdd, memo = '') {
             if (!this.currentUser) {
                 alert('Error: No user selected. Please select a user first.');
                 return;
@@ -230,41 +231,60 @@ createApp({
                 console.error('Error updating Firestore:', error);
             }
             localStorage.setItem("headerTotal", this.headerTotal);
+
+            //TODO: Save memo and other details to history collection
+        },
+        customEntry(){
+            if(this.activeTab === 'Earn'){
+                this.customEntryMode = 'Activity';
+            } else if(this.activeTab === 'Redeem'){
+                this.customEntryMode = 'Reward';
+            //} else if(this.activeTab === 'Goals'){
+            //} else if(this.activeTab === 'Achievements'){
+            } else if(this.activeTab === 'History'){
+                this.customEntryMode = 'Reset';
+            } else {
+                console.error('Unknown tab for custom entry');
+                return;
+            }
+            this.showCustomEntryModal = true;
+        },
+        closeCustomEntryModal(){
+            this.showCustomEntryModal = false;
+            this.customEntryMode = null;
+            this.customEntryPointValue = null;
+            this.customEntryMemo = '';
         },
         addCustomPoints() {
-            const pointsToAdd = Math.abs(parseFloat(this.addPointsInput));
+            const pointsToAdd = Math.abs(parseFloat(this.customEntryPointValue));
             if (!pointsToAdd) {
                 return;
             }
-            this.addPoints(pointsToAdd);
-            this.addPointsInput = null;
+            const memo = "Custom: " + this.customEntryMemo || "No memo";
+            this.addPoints(pointsToAdd, memo);
+
+            this.closeCustomEntryModal();
         },
         subtractCustomPoints() {
-            const pointsToSubtract = Math.abs(parseFloat(this.subtractPointsInput));
+            const pointsToSubtract = Math.abs(parseFloat(this.customEntryPointValue));
             if (!pointsToSubtract) {
                 return;
             }
-            this.addPoints(pointsToSubtract * -1);
-            this.subtractPointsInput = null;
+            const memo = "Custom: " + this.customEntryMemo || "No memo";
+            this.addPoints(pointsToSubtract * -1, memo);
+            this.closeCustomEntryModal();
         },
         async resetPoints() {
             if (!this.currentUser) return;
             
-            const resetTotal = parseFloat(this.resetPointsInput);
+            const resetTotal = parseFloat(this.customEntryPointValue);
             if (!resetTotal && resetTotal !== 0) {
                 return;
             }
-            this.headerTotal = resetTotal;
-            
-            // Save to Firestore and localStorage
-            try {
-                const docRef = doc(db, 'users', this.currentUser);
-                await updateDoc(docRef, { currentTotal: resetTotal });
-            } catch (error) {
-                console.error('Error updating Firestore:', error);
-            }
-            localStorage.setItem("headerTotal", resetTotal);
-            this.resetPointsInput = null;
+            const memo = "Reset: " + this.customEntryMemo || "No memo";
+            this.addPoints(resetTotal - this.headerTotal, memo);
+
+            this.closeCustomEntryModal();
         },
         earnPreset(entryId) {
             const entry = this.earnData[entryId];
@@ -279,7 +299,7 @@ createApp({
                 this.showActivityModal = true;
             } else if (entry && entry.pointValue) {
                 // Legacy: direct point value without options
-                this.addPoints(entry.pointValue);
+                this.addPoints(entry.pointValue, this.selectedActivity.name);
             }
         },
         selectQuantity(quantity) {
@@ -295,13 +315,13 @@ createApp({
         claimActivityPoints() {
             if (!this.selectedQuantity) return;
             
-            this.addPoints(this.calculatedPoints);
+            this.addPoints(this.calculatedPoints, this.selectedActivity.name);
             this.closeActivityModal();
         },
         redeemPreset(entryId) {
             const entry = this.redeemData[entryId];
             if (entry && entry.pointValue) {
-                this.addPoints(entry.pointValue * -1);
+                this.addPoints(entry.pointValue * -1, entry.name);
             }
         },
         viewHistory(entryId) {
