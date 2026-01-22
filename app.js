@@ -1,4 +1,4 @@
-import { db, auth, collection, getDocs, doc, getDoc, setDoc, updateDoc, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from './firebaseConfig.js';
+import { db, auth, collection, getDocs, doc, getDoc, setDoc, updateDoc, addDoc, query, where, orderBy, onSnapshot, Timestamp, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from './firebaseConfig.js';
 
 const { createApp } = Vue;
 
@@ -24,6 +24,7 @@ createApp({
             earnData: {},
             redeemData: {},
             historyData: {},
+            historyUnsubscribe: null,
             customEntryMode: null,
             showCustomEntryModal: false,
             customEntryPointValue: null,
@@ -49,6 +50,7 @@ createApp({
                 // Load user data
                 await this.loadHeaderTotal();
                 await this.loadTabData();
+                this.loadHistoryData();
             } else {
                 // User is signed out
                 this.isAuthenticated = false;
@@ -65,6 +67,10 @@ createApp({
     beforeUnmount() {
         // Clean up event listener
         document.removeEventListener('click', this.handleClickOutside);
+        // Clean up Firestore listener
+        if (this.historyUnsubscribe) {
+            this.historyUnsubscribe();
+        }
     },
     methods: {
         async handleLogin() {
@@ -88,7 +94,7 @@ createApp({
                     email: this.email,
                     displayName: this.displayName,
                     currentTotal: 0,
-                    createdAt: new Date().toISOString()
+                    createdAt: Timestamp.now()
                 });
                 this.email = '';
                 this.password = '';
@@ -100,6 +106,12 @@ createApp({
         },
         async handleSignOut() {
             try {
+                // Clean up history listener
+                if (this.historyUnsubscribe) {
+                    this.historyUnsubscribe();
+                    this.historyUnsubscribe = null;
+                }
+                
                 await signOut(auth);
                 // Clear local data
                 this.headerTotal = null;
@@ -164,7 +176,7 @@ createApp({
                         currentTotal: 0,
                         email: this.userEmail,
                         displayName: this.userEmail,
-                        createdAt: new Date().toISOString()
+                        createdAt: Timestamp.now()
                     });
                 }
             } catch (error) {
@@ -178,24 +190,43 @@ createApp({
             try {
                 this.earnData = await this.loadCollection('activities');
                 this.redeemData = await this.loadCollection('rewards');
-                await this.loadHistoryData();
             } catch (error) {
                 console.error('Error loading tab data:', error);
             }
         },
-        async loadHistoryData() {
+        loadHistoryData() {
             if (!this.currentUser) return;
             
+            // Unsubscribe from previous listener if exists
+            if (this.historyUnsubscribe) {
+                this.historyUnsubscribe();
+            }
+            
             try {
+                // Calculate date 30 days ago
+                const thirtyDaysAgo = new Date();
+                thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+                
                 const historyRef = collection(db, 'users', this.currentUser, 'history');
-                const querySnapshot = await getDocs(historyRef);
-                const data = {};
-                querySnapshot.forEach((doc) => {
-                    data[doc.id] = doc.data();
+                const q = query(
+                    historyRef, 
+                    where('timestamp', '>=', Timestamp.fromDate(thirtyDaysAgo)),
+                    orderBy("timestamp", "desc")
+                );
+                
+                // Set up real-time listener
+                this.historyUnsubscribe = onSnapshot(q, (querySnapshot) => {
+                    const data = {};
+                    querySnapshot.forEach((doc) => {
+                        data[doc.id] = doc.data();
+                    });
+                    this.historyData = data;
+                }, (error) => {
+                    console.error('Error loading history:', error);
+                    this.historyData = {};
                 });
-                this.historyData = data;
             } catch (error) {
-                console.error('Error loading history:', error);
+                console.error('Error setting up history listener:', error);
                 this.historyData = {};
             }
         },
@@ -232,7 +263,18 @@ createApp({
             }
             localStorage.setItem("headerTotal", this.headerTotal);
 
-            //TODO: Save memo and other details to history collection
+            //Save memo and other details to history collection
+            try {
+                const historyRef = collection(db, 'users', this.currentUser, 'history');
+                await addDoc(historyRef, {
+                    headerTotal: this.headerTotal,
+                    memo: memo,
+                    pointsAdded: pointsToAdd,
+                    timestamp: Timestamp.now()
+                });
+            } catch (error) {
+                console.error('Error saving to history:', error);
+            }
         },
         customEntry(){
             if(this.activeTab === 'Earn'){
@@ -323,9 +365,6 @@ createApp({
             if (entry && entry.pointValue) {
                 this.addPoints(entry.pointValue * -1, entry.name);
             }
-        },
-        viewHistory(entryId) {
-            // Placeholder for future functionality
         }
     },
     computed: {

@@ -163,9 +163,10 @@
 
         <div v-show="activeTab === 'History'" class="tabcontent">
             <h3>Points Earned and Redeemed</h3>
-            <div v-for="(widget, id) in historyData" :key="id" class="widget" @click="viewHistory(id)">
-                <div class="title">{{ widget.name }}</div>
-                <div class="value">{{ widget.pointValue }}</div>
+            <div v-for="(widget, id) in historyData" :key="id" class="widget history-widget">
+                <div class="history-memo">{{ widget.memo }}</div>
+                <div class="history-points">{{ widget.pointsAdded }}</div>
+                <div class="history-total">{{ widget.headerTotal }}</div>
             </div>
             <!-- Fixed bottom container for custom entry -->
             <div class="fixed-bottom-container">

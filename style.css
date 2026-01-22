@@ -277,6 +277,36 @@ button {
     color: orange;
 }
 
+/* History Widget Styling */
+.history-widget {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.history-memo {
+    flex: 2;
+    font-size: 14px;
+    text-align: left;
+}
+
+.history-points {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.history-total {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 500;
+    color:#666;
+    font-style:italic;
+    text-align: right;
+}
+
 /* Activity Tiles */
 .tile-grid {
     display: grid;
