@@ -72,8 +72,14 @@
         <div v-if="isAuthenticated">
         <header>
             <div class="user-selector-container">
-                <span class="user-display">{{ userDisplayName }}</span>
-                <button @click="handleSignOut" class="sign-out-button">Sign Out</button>
+                <button @click="toggleUserMenu" class="user-menu-button">
+                    Hi, {{ userDisplayName }}!
+                </button>
+                <div v-if="showUserMenu" class="user-dropdown">
+                    <button @click="handleSignOut" class="user-menu-option">
+                        Sign Out
+                    </button>
+                </div>
             </div>
         </header>
         <section class="hero">

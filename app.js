@@ -15,6 +15,7 @@ createApp({
             displayName: '',
             isSignupMode: false,
             authError: null,
+            showUserMenu: false,
             
             // App data
             headerTotal: null,
@@ -54,6 +55,13 @@ createApp({
                 this.userDisplayName = null;
             }
         });
+        
+        // Close user menu when clicking outside
+        document.addEventListener('click', this.handleClickOutside);
+    },
+    beforeUnmount() {
+        // Clean up event listener
+        document.removeEventListener('click', this.handleClickOutside);
     },
     methods: {
         async handleLogin() {
@@ -104,6 +112,16 @@ createApp({
             this.isSignupMode = !this.isSignupMode;
             this.authError = null;
             this.displayName = '';
+        },
+        toggleUserMenu() {
+            this.showUserMenu = !this.showUserMenu;
+        },
+        handleClickOutside(event) {
+            // Close menu if clicking outside the user menu container
+            const userMenuContainer = event.target.closest('.user-selector-container');
+            if (!userMenuContainer && this.showUserMenu) {
+                this.showUserMenu = false;
+            }
         },
         getAuthErrorMessage(errorCode) {
             switch (errorCode) {
