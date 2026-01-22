@@ -12,7 +12,7 @@
 <body>
     <div id="app" v-cloak>
         <!-- Login Screen -->
-        <div v-if="!isAuthenticated" class="login-container">
+        <div v-if="!isAuthenticated && authChecked" class="login-container">
             <div class="login-box">
                 <h1>High Score Health</h1>
                 <h2>{{ isSignupMode ? 'Create Account' : 'Login' }}</h2>

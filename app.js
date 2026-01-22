@@ -7,6 +7,7 @@ createApp({
         return {
             // Authentication
             isAuthenticated: false,
+            authChecked: false,
             currentUser: null,
             userEmail: null,
             userDisplayName: null,
@@ -54,6 +55,7 @@ createApp({
                 this.userEmail = null;
                 this.userDisplayName = null;
             }
+            this.authChecked = true;
         });
         
         // Close user menu when clicking outside
