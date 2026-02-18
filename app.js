@@ -17,7 +17,7 @@ createApp({
             isSignupMode: false,
             authError: null,
             showUserMenu: false,
-            
+
             // App data
             headerTotal: null,
             activeTab: 'Earn',
@@ -36,7 +36,8 @@ createApp({
             selectedActivityId: null,
             selectedQuantity: null,
             selectedIntensity: 1, // 0=Easy, 1=Moderate, 2=Intense
-            weightInput: null
+            trackingMetric: 'weight',
+            trackingInput: null
         }
     },
     async mounted() {
@@ -47,7 +48,7 @@ createApp({
                 this.isAuthenticated = true;
                 this.currentUser = user.uid;
                 this.userEmail = user.email;
-                
+
                 // Load user data
                 await this.loadHeaderTotal();
                 await this.loadTabData();
@@ -61,7 +62,7 @@ createApp({
             }
             this.authChecked = true;
         });
-        
+
         // Close user menu when clicking outside
         document.addEventListener('click', this.handleClickOutside);
     },
@@ -112,7 +113,7 @@ createApp({
                     this.historyUnsubscribe();
                     this.historyUnsubscribe = null;
                 }
-                
+
                 await signOut(auth);
                 // Clear local data
                 this.headerTotal = null;
@@ -161,11 +162,11 @@ createApp({
         },
         async loadHeaderTotal() {
             if (!this.currentUser) return;
-            
+
             try {
                 const docRef = doc(db, 'users', this.currentUser);
                 const docSnap = await getDoc(docRef);
-                
+
                 if (docSnap.exists()) {
                     this.headerTotal = docSnap.data().currentTotal || 0;
                     this.userDisplayName = docSnap.data().displayName || this.userEmail;
@@ -173,7 +174,7 @@ createApp({
                     // Initialize if doesn't exist
                     this.headerTotal = 0;
                     this.userDisplayName = this.userEmail;
-                    await setDoc(docRef, { 
+                    await setDoc(docRef, {
                         currentTotal: 0,
                         email: this.userEmail,
                         displayName: this.userEmail,
@@ -197,24 +198,24 @@ createApp({
         },
         loadHistoryData() {
             if (!this.currentUser) return;
-            
+
             // Unsubscribe from previous listener if exists
             if (this.historyUnsubscribe) {
                 this.historyUnsubscribe();
             }
-            
+
             try {
                 // Calculate date 30 days ago
                 const thirtyDaysAgo = new Date();
                 thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-                
+
                 const historyRef = collection(db, 'users', this.currentUser, 'history');
                 const q = query(
-                    historyRef, 
+                    historyRef,
                     where('timestamp', '>=', Timestamp.fromDate(thirtyDaysAgo)),
                     orderBy("timestamp", "desc")
                 );
-                
+
                 // Set up real-time listener
                 this.historyUnsubscribe = onSnapshot(q, (querySnapshot) => {
                     const data = {};
@@ -252,9 +253,9 @@ createApp({
                 alert('Error: No user selected. Please select a user first.');
                 return;
             }
-            
+
             this.headerTotal += pointsToAdd;
-            
+
             // Save to Firestore and localStorage
             try {
                 const docRef = doc(db, 'users', this.currentUser);
@@ -277,14 +278,14 @@ createApp({
                 console.error('Error saving to history:', error);
             }
         },
-        customEntry(){
-            if(this.activeTab === 'Earn'){
+        customEntry() {
+            if (this.activeTab === 'Earn') {
                 this.customEntryMode = 'Activity';
-            } else if(this.activeTab === 'Redeem'){
+            } else if (this.activeTab === 'Redeem') {
                 this.customEntryMode = 'Reward';
-            //} else if(this.activeTab === 'Goals'){
-            //} else if(this.activeTab === 'Achievements'){
-            } else if(this.activeTab === 'History'){
+                //} else if(this.activeTab === 'Goals'){
+                //} else if(this.activeTab === 'Achievements'){
+            } else if (this.activeTab === 'History') {
                 this.customEntryMode = 'Reset';
             } else {
                 console.error('Unknown tab for custom entry');
@@ -292,7 +293,7 @@ createApp({
             }
             this.showCustomEntryModal = true;
         },
-        closeCustomEntryModal(){
+        closeCustomEntryModal() {
             this.showCustomEntryModal = false;
             this.customEntryMode = null;
             this.customEntryPointValue = null;
@@ -319,7 +320,7 @@ createApp({
         },
         async resetPoints() {
             if (!this.currentUser) return;
-            
+
             const resetTotal = parseFloat(this.customEntryPointValue);
             if (!resetTotal && resetTotal !== 0) {
                 return;
@@ -357,7 +358,7 @@ createApp({
         },
         claimActivityPoints() {
             if (!this.selectedQuantity) return;
-            
+
             this.addPoints(this.calculatedPoints, this.selectedActivity.name);
             this.closeActivityModal();
         },
@@ -367,47 +368,44 @@ createApp({
                 this.addPoints(entry.pointValue * -1, entry.name);
             }
         },
-        async sendTrackingData(user, metric, value) {
-            try {
-                const trackingRef = collection(db, 'users', user, 'tracking');
-                await addDoc(trackingRef, {
-                    metric: metric,
-                    value: value,
-                    timestamp: Timestamp.now()
-                });
-                
-                alert('Logging successful!');
-            } catch (error) {
-                console.error(`Error logging ${metric} of ${value} for user ${user}:`, error);
-                alert('Logging failed. Please try again.');
-            }
-        },        
-        async logWeight() {
+        async logTrackingData() {
             if (!this.currentUser) {
                 alert('Error: No user selected. Please select a user first.');
                 return;
             }
-            
-            if (!this.weightInput || this.weightInput <= 0) {
-                alert('Please enter a valid weight.');
+
+            if (!this.trackingInput || this.trackingInput <= 0) {
+                alert(`Please enter a valid ${this.trackingMetric}.`);
                 return;
             }
 
-            await this.sendTrackingData(this.currentUser, 'weight', this.weightInput);
-            
+            try {
+                const trackingRef = collection(db, 'users', this.currentUser, 'tracking');
+                await addDoc(trackingRef, {
+                    metric: this.trackingMetric,
+                    value: this.trackingInput,
+                    timestamp: Timestamp.now()
+                });
+
+                alert('Logging successful!');
+            } catch (error) {
+                console.error(`Error logging ${this.trackingMetric} of ${this.trackingInput} for user ${this.currentUser}:`, error);
+                alert('Logging failed. Please try again.');
+            }
+
             // Clear the input
-            this.weightInput = null;
+            this.trackingInput = null;
         }
     },
     computed: {
         filteredEarnData() {
             if (!this.earnData) return {};
-            
+
             const filtered = {};
             for (const [id, activity] of Object.entries(this.earnData)) {
                 const isOutdoor = activity.outdoors === true;
                 const isIndoor = activity.outdoors === false;
-                
+
                 // Show if conditions match
                 if ((isIndoor && this.showIndoor) || (isOutdoor && this.showOutdoor)) {
                     filtered[id] = activity;
@@ -417,16 +415,16 @@ createApp({
         },
         calculatedPoints() {
             if (!this.selectedActivity || !this.selectedQuantity) return 0;
-            
+
             const basePoints = this.selectedActivity.pointsByUnit[this.selectedQuantity];
-            
+
             if (this.selectedActivity.intensityModifier) {
                 const intensityKeys = ["Easy", "Moderate", "Intense"];
                 const intensityKey = intensityKeys[this.selectedIntensity];
                 const modifier = this.selectedActivity.intensityModifier[intensityKey];
                 return Math.round(basePoints * modifier);
             }
-            
+
             return basePoints;
         }
     }

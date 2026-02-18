@@ -167,15 +167,22 @@
             <div class="container">
                 <div class="tracking-input-container">
                     <div class="tracking-input-group">
-                        <label for="weight-input">Weight</label>
+                        <select 
+                            v-model="trackingMetric" 
+                            class="tracking-metric-select"
+                            id="tracking-metric"
+                        >
+                            <option value="weight">Weight</option>
+                            <option value="waist">Waist</option>
+                        </select>
                         <input 
                             type="number" 
-                            id="weight-input"
-                            v-model.number="weightInput"
+                            id="tracking-input"
+                            v-model.number="trackingInput"
                             step="0.1"
-                            @keyup.enter="logWeight"
+                            @keyup.enter="logTrackingData"
                         >
-                        <button @click="logWeight" class="log-button">Log</button>
+                        <button @click="logTrackingData" class="log-button">Log</button>
                     </div>
                 </div>
             </div>

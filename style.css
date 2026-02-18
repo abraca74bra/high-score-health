@@ -472,6 +472,24 @@ input:checked + .slider:before {
     gap: 10px;
 }
 
+.tracking-metric-select {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+    background-color: white;
+    color: #333;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color 0.3s;
+    min-width: 120px;
+}
+
+.tracking-metric-select:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
 .tracking-input-container label {
     flex: 1;
     padding: 12px;
