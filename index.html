@@ -94,6 +94,7 @@
             <button class="tablinks" :class="{ active: activeTab === 'Redeem' }" @click="openTab('Redeem')">Redeem</button>
             <button class="tablinks" :class="{ active: activeTab === 'Goals' }" @click="openTab('Goals')">Goals</button>
             <button class="tablinks" :class="{ active: activeTab === 'Achievements' }" @click="openTab('Achievements')">Achievements</button>
+            <button class="tablinks" :class="{ active: activeTab === 'Tracking' }" @click="openTab('Tracking')">Tracking</button>
             <button class="tablinks" :class="{ active: activeTab === 'History' }" @click="openTab('History')">History</button>
         </div>
 
@@ -159,6 +160,25 @@
         <div v-show="activeTab === 'Achievements'" class="tabcontent">
             <h3>Achievements</h3>
             <p>Content coming soon</p>
+        </div>
+
+        <div v-show="activeTab === 'Tracking'" class="tabcontent">
+            <h3>Tracking</h3>
+            <div class="container">
+                <div class="tracking-input-container">
+                    <div class="tracking-input-group">
+                        <label for="weight-input">Weight</label>
+                        <input 
+                            type="number" 
+                            id="weight-input"
+                            v-model.number="weightInput"
+                            step="0.1"
+                            @keyup.enter="logWeight"
+                        >
+                        <button @click="logWeight" class="log-button">Log</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div v-show="activeTab === 'History'" class="tabcontent">

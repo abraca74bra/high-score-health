@@ -460,6 +460,55 @@ input:checked + .slider:before {
     transition: background-color 0.3s;
 }
 
+/* Tracking Tab */
+.tracking-input-container {
+    max-width: 500px;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+.tracking-input-group {
+    display: flex;
+    gap: 10px;
+}
+
+.tracking-input-container label {
+    flex: 1;
+    padding: 12px;
+    color: #333;
+    font-weight: 500;
+    font-size: 16px;
+}
+
+.tracking-input-group input[type="number"] {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+.tracking-input-group input[type="number"]:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.log-button {
+    padding: 12px 30px;
+    background-color: #667eea;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: background-color 0.3s;
+}
+
+.log-button:hover {
+    background-color: #5568d3;
+}
+
 /* Activity Modal */
 .modal-overlay {
     position: fixed;

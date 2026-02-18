@@ -35,7 +35,8 @@ createApp({
             selectedActivity: null,
             selectedActivityId: null,
             selectedQuantity: null,
-            selectedIntensity: 1 // 0=Easy, 1=Moderate, 2=Intense
+            selectedIntensity: 1, // 0=Easy, 1=Moderate, 2=Intense
+            weightInput: null
         }
     },
     async mounted() {
@@ -365,6 +366,37 @@ createApp({
             if (entry && entry.pointValue) {
                 this.addPoints(entry.pointValue * -1, entry.name);
             }
+        },
+        async sendTrackingData(user, metric, value) {
+            try {
+                const trackingRef = collection(db, 'users', user, 'tracking');
+                await addDoc(trackingRef, {
+                    metric: metric,
+                    value: value,
+                    timestamp: Timestamp.now()
+                });
+                
+                alert('Logging successful!');
+            } catch (error) {
+                console.error(`Error logging ${metric} of ${value} for user ${user}:`, error);
+                alert('Logging failed. Please try again.');
+            }
+        },        
+        async logWeight() {
+            if (!this.currentUser) {
+                alert('Error: No user selected. Please select a user first.');
+                return;
+            }
+            
+            if (!this.weightInput || this.weightInput <= 0) {
+                alert('Please enter a valid weight.');
+                return;
+            }
+
+            await this.sendTrackingData(this.currentUser, 'weight', this.weightInput);
+            
+            // Clear the input
+            this.weightInput = null;
         }
     },
     computed: {
