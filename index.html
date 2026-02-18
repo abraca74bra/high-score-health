@@ -7,6 +7,8 @@
     <title>High Score Health Point Tracker</title>
     <link rel="stylesheet" href="style.css" />
     <link rel="icon" type="image/png" href="icons/heart-plus.png">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 </head>
 
 <body>
@@ -171,6 +173,7 @@
                             v-model="trackingMetric" 
                             class="tracking-metric-select"
                             id="tracking-metric"
+                            @change="loadTrackingData"
                         >
                             <option value="weight">Weight</option>
                             <option value="waist">Waist</option>
@@ -184,6 +187,21 @@
                         >
                         <button @click="logTrackingData" class="log-button">Log</button>
                     </div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="date-range-selector">
+                        <button 
+                            v-for="range in dateRangeOptions" 
+                            :key="range.value"
+                            @click="setDateRange(range.value)"
+                            :class="{ active: trackingDateRange === range.value }"
+                            class="date-range-button"
+                        >
+                            {{ range.label }}
+                        </button>
+                    </div>
+                    <canvas id="trackingChart"></canvas>
                 </div>
             </div>
         </div>

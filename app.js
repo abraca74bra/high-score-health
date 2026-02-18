@@ -37,7 +37,16 @@ createApp({
             selectedQuantity: null,
             selectedIntensity: 1, // 0=Easy, 1=Moderate, 2=Intense
             trackingMetric: 'weight',
-            trackingInput: null
+            trackingInput: null,
+            trackingDateRange: 30,
+            dateRangeOptions: [
+                { value: 30, label: '30 Days' },
+                { value: 90, label: '90 Days' },
+                { value: 180, label: '6 Months' },
+                { value: 365, label: '1 Year' }
+            ],
+            trackingData: [],
+            trackingChart: null
         }
     },
     async mounted() {
@@ -53,6 +62,7 @@ createApp({
                 await this.loadHeaderTotal();
                 await this.loadTabData();
                 this.loadHistoryData();
+                await this.loadTrackingData();
             } else {
                 // User is signed out
                 this.isAuthenticated = false;
@@ -72,6 +82,10 @@ createApp({
         // Clean up Firestore listener
         if (this.historyUnsubscribe) {
             this.historyUnsubscribe();
+        }
+        // Clean up chart
+        if (this.trackingChart) {
+            this.trackingChart.destroy();
         }
     },
     methods: {
@@ -387,6 +401,10 @@ createApp({
                     timestamp: Timestamp.now()
                 });
 
+                // Clear input and reload data
+                this.trackingInput = null;
+                await this.loadTrackingData();
+                
                 alert('Logging successful!');
             } catch (error) {
                 console.error(`Error logging ${this.trackingMetric} of ${this.trackingInput} for user ${this.currentUser}:`, error);
@@ -395,6 +413,125 @@ createApp({
 
             // Clear the input
             this.trackingInput = null;
+        },
+        setDateRange(days) {
+            this.trackingDateRange = days;
+            this.loadTrackingData();
+        },
+        async loadTrackingData() {
+            if (!this.currentUser) return;
+            
+            try {
+                const daysAgo = new Date();
+                daysAgo.setDate(daysAgo.getDate() - this.trackingDateRange);
+                
+                const trackingRef = collection(db, 'users', this.currentUser, 'tracking');
+                const q = query(
+                    trackingRef,
+                    where('metric', '==', this.trackingMetric),
+                    where('timestamp', '>=', Timestamp.fromDate(daysAgo)),
+                    orderBy('timestamp', 'asc')
+                );
+                
+                const querySnapshot = await getDocs(q);
+                this.trackingData = [];
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    this.trackingData.push({
+                        value: data.value,
+                        timestamp: data.timestamp.toDate()
+                    });
+                });
+                
+                // Render the chart after data is loaded
+                this.$nextTick(() => {
+                    this.renderTrackingChart();
+                });
+            } catch (error) {
+                console.error('Error loading tracking data:', error);
+                this.trackingData = [];
+            }
+        },
+        renderTrackingChart() {
+            const canvas = document.getElementById('trackingChart');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (this.trackingChart) {
+                this.trackingChart.destroy();
+            }
+            
+            // Prepare data for chart with x,y coordinate pairs
+            const dataPoints = this.trackingData.map(item => ({
+                x: item.timestamp,
+                y: item.value
+            }));
+            
+            this.trackingChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        label: this.trackingMetric.charAt(0).toUpperCase() + this.trackingMetric.slice(1),
+                        data: dataPoints,
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0,
+                        fill: false,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: false,
+                            position: 'top'
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: 'day',
+                                displayFormats: {
+                                    day: 'MMM d'
+                                },
+                                tooltipFormat: 'MMM d, yyyy'
+                            },
+                            adapters: {
+                                date: {}
+                            },
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            },
+                            ticks: {
+                                source: 'auto',
+                                autoSkip: true,
+                                maxRotation: 30,
+                                minRotation: 30
+                            }
+                        },
+                        y: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: this.trackingMetric.charAt(0).toUpperCase() + this.trackingMetric.slice(1)
+                            },
+                            beginAtZero: false
+                        }
+                    }
+                }
+            });
         }
     },
     computed: {

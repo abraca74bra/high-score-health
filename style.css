@@ -527,6 +527,50 @@ input:checked + .slider:before {
     background-color: #5568d3;
 }
 
+/* Chart Container */
+.chart-container {
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.date-range-selector {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.date-range-button {
+    padding: 8px 16px;
+    border: 2px solid #ddd;
+    background-color: white;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #666;
+    transition: all 0.3s;
+}
+
+.date-range-button:hover {
+    border-color: #667eea;
+    color: #667eea;
+}
+
+.date-range-button.active {
+    background-color: #667eea;
+    border-color: #667eea;
+    color: white;
+}
+
+#trackingChart {
+    max-height: 400px;
+}
+
 /* Activity Modal */
 .modal-overlay {
     position: fixed;
