@@ -185,9 +185,7 @@
                             step="0.1"
                             @keyup.enter="logTrackingData"
                         >
-                        <button @click="logTrackingData" class="log-button" :disabled="processingAction">
-                            {{ processingAction ? 'Logging...' : 'Log' }}
-                        </button>
+                        <button @click="logTrackingData" class="log-button">Log</button>
                     </div>
                 </div>
                 
@@ -265,8 +263,8 @@
                 
                 <button 
                     class="claim-button"
-                    :class="{ disabled: !selectedQuantity || processingAction }"
-                    :disabled="!selectedQuantity || processingAction"
+                    :class="{ disabled: !selectedQuantity }"
+                    :disabled="!selectedQuantity"
                     @click="claimActivityPoints"
                 >
                     {{ selectedQuantity ? `Claim ${calculatedPoints} points!` : 'Please select the exercise amount' }}
@@ -299,8 +297,8 @@
                 <div v-if="customEntryMode == 'Activity'" class="modal-section">
                     <button 
                         class="claim-button"
-                        :class="{ disabled: !customEntryPointValue || processingAction }"
-                        :disabled="!customEntryPointValue || processingAction"
+                        :class="{ disabled: !customEntryPointValue }"
+                        :disabled="!customEntryPointValue"
                         @click="addCustomPoints"
                     >
                         {{ !customEntryPointValue ? 'Please enter a point value' : `Claim ${customEntryPointValue} points!` }}
@@ -309,8 +307,8 @@
                 <div v-else-if="customEntryMode == 'Reward'" class="modal-section">
                     <button 
                         class="claim-button"
-                        :class="{ disabled: !customEntryPointValue || processingAction }"
-                        :disabled="!customEntryPointValue || processingAction"
+                        :class="{ disabled: !customEntryPointValue }"
+                        :disabled="!customEntryPointValue"
                         @click="subtractCustomPoints"
                     >
                         {{ !customEntryPointValue ? 'Please enter a point value' : `Redeem ${customEntryPointValue} points!` }}
@@ -319,8 +317,8 @@
                 <div v-else-if="customEntryMode == 'Reset'" class="modal-section">
                     <button 
                         class="claim-button"
-                        :class="{ disabled: customEntryPointValue === null || processingAction }"
-                        :disabled="customEntryPointValue === null || processingAction"
+                        :class="{ disabled: customEntryPointValue === null }"
+                        :disabled="customEntryPointValue === null"
                         @click="resetPoints"
                     >
                         {{ customEntryPointValue === null ? 'Please enter a point value' : `Reset point total to ${customEntryPointValue}` }}

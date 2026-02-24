@@ -1,4 +1,4 @@
-import { db, auth, collection, getDocs, doc, getDoc, setDoc, updateDoc, addDoc, query, where, orderBy, onSnapshot, Timestamp, increment, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from './firebaseConfig.js';
+import { db, auth, collection, getDocs, doc, getDoc, setDoc, updateDoc, addDoc, query, where, orderBy, onSnapshot, Timestamp, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from './firebaseConfig.js';
 
 const { createApp } = Vue;
 
@@ -36,7 +36,6 @@ createApp({
             selectedActivityId: null,
             selectedQuantity: null,
             selectedIntensity: 1, // 0=Easy, 1=Moderate, 2=Intense
-            processingAction: false,
             trackingMetric: 'weight',
             trackingInput: null,
             trackingDateRange: 30,
@@ -91,11 +90,6 @@ createApp({
     },
     methods: {
         async handleLogin() {
-            if (this.processingAction){
-                alert('Request in progress. Please wait.');
-                return;
-            } 
-            this.processingAction = true;
             this.authError = null;
             try {
                 await signInWithEmailAndPassword(auth, this.email, this.password);
@@ -105,16 +99,9 @@ createApp({
             } catch (error) {
                 console.error('Login error:', error);
                 this.authError = this.getAuthErrorMessage(error.code);
-            } finally {
-                this.processingAction = false;
             }
         },
         async handleSignup() {
-            if (this.processingAction){
-                alert('Request in progress. Please wait.');
-                return;
-            } 
-            this.processingAction = true;
             this.authError = null;
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, this.email, this.password);
@@ -131,16 +118,9 @@ createApp({
             } catch (error) {
                 console.error('Signup error:', error);
                 this.authError = this.getAuthErrorMessage(error.code);
-            } finally {
-                this.processingAction = false;
             }
         },
         async handleSignOut() {
-            if (this.processingAction){
-                alert('Request in progress. Please wait.');
-                return;
-            } 
-            this.processingAction = true;
             try {
                 // Clean up history listener
                 if (this.historyUnsubscribe) {
@@ -157,8 +137,6 @@ createApp({
                 this.userDisplayName = null;
             } catch (error) {
                 console.error('Sign out error:', error);
-            } finally {
-                this.processingAction = false;
             }
         },
         toggleAuthMode() {
@@ -314,19 +292,6 @@ createApp({
                 console.error('Error saving to history:', error);
             }
         },
-        async updateActivityPresetUsage(entryId) {
-            if (!entryId) return;
-
-            try {
-                const activityRef = doc(db, 'activities', entryId);
-                await updateDoc(activityRef, {
-                    timesUsed: increment(1),
-                    lastUsed: Timestamp.now()
-                });
-            } catch (error) {
-                console.error(`Error updating activity preset usage for ${entryId}:`, error);
-            }
-        },
         customEntry() {
             if (this.activeTab === 'Earn') {
                 this.customEntryMode = 'Activity';
@@ -348,72 +313,38 @@ createApp({
             this.customEntryPointValue = null;
             this.customEntryMemo = '';
         },
-        async addCustomPoints() {
-            if (this.processingAction){
-                alert('Request in progress. Please wait.');
-                return;
-            } 
+        addCustomPoints() {
             const pointsToAdd = Math.abs(parseFloat(this.customEntryPointValue));
             if (!pointsToAdd) {
                 return;
             }
-            this.processingAction = true;
-            try {
-                const memo = "Custom: " + this.customEntryMemo || "No memo";
-                await this.addPoints(pointsToAdd, memo);
-            } catch (error) {
-                console.error('Error adding custom points:', error);
-                alert('Failed to add custom activity points. Please try again.');
-            } finally {
-                this.closeCustomEntryModal();
-                this.processingAction = false;
-            }
+            const memo = "Custom: " + this.customEntryMemo || "No memo";
+            this.addPoints(pointsToAdd, memo);
+
+            this.closeCustomEntryModal();
         },
-        async subtractCustomPoints() {
-            if (this.processingAction){
-                alert('Request in progress. Please wait.');
-                return;
-            } 
+        subtractCustomPoints() {
             const pointsToSubtract = Math.abs(parseFloat(this.customEntryPointValue));
             if (!pointsToSubtract) {
                 return;
             }
-            this.processingAction = true;
-            try {
-                const memo = "Custom: " + this.customEntryMemo || "No memo";
-                await this.addPoints(pointsToSubtract * -1, memo);
-            } catch (error) {
-                console.error('Error subtracting custom points:', error);
-                alert('Failed to redeem custom reward points. Please try again.');
-            } finally {
-                this.closeCustomEntryModal();
-                this.processingAction = false;
-            }
+            const memo = "Custom: " + this.customEntryMemo || "No memo";
+            this.addPoints(pointsToSubtract * -1, memo);
+            this.closeCustomEntryModal();
         },
         async resetPoints() {
             if (!this.currentUser) return;
-            if (this.processingAction){
-                alert('Request in progress. Please wait.');
-                return;
-            }
 
             const resetTotal = parseFloat(this.customEntryPointValue);
             if (!resetTotal && resetTotal !== 0) {
                 return;
             }
-            this.processingAction = true;
-            try {
-                const memo = "Reset: " + this.customEntryMemo || "No memo";
-                await this.addPoints(resetTotal - this.headerTotal, memo);
-            } catch (error) {
-                console.error('Error resetting points:', error);
-                alert('Failed to reset points. Please try again.');
-            } finally {
-                this.closeCustomEntryModal();
-                this.processingAction = false;
-            }
+            const memo = "Reset: " + this.customEntryMemo || "No memo";
+            this.addPoints(resetTotal - this.headerTotal, memo);
+
+            this.closeCustomEntryModal();
         },
-        async earnPreset(entryId) {
+        earnPreset(entryId) {
             const entry = this.earnData[entryId];
             if (entry && entry.pointsByUnit) {
                 // Open modal for activity details
@@ -424,16 +355,9 @@ createApp({
                 this.selectedQuantity = quantities.length > 0 ? parseInt(quantities[0]) : null;
                 this.selectedIntensity = 1; // Default to Moderate
                 this.showActivityModal = true;
-                // Point addition occurs when the user claims the specific point value
-                // in the modal
-            } 
-            else {
-                if(!entry){
-                    alert('Error: Activity configuration not found. Please contact support.');
-                } 
-                else if(!entry.pointValue) {
-                    alert('Error: No point values by unit are defined for this activity. Please contact support.');
-                }
+            } else if (entry && entry.pointValue) {
+                // Legacy: direct point value without options
+                this.addPoints(entry.pointValue, this.selectedActivity.name);
             }
         },
         selectQuantity(quantity) {
@@ -446,41 +370,16 @@ createApp({
             this.selectedQuantity = null;
             this.selectedIntensity = 1;
         },
-        async claimActivityPoints() {
+        claimActivityPoints() {
             if (!this.selectedQuantity) return;
-            if (this.processingAction){
-                alert('Request in progress. Please wait.');
-                return;
-            }
 
-            this.processingAction = true;
-            try {
-                await this.addPoints(this.calculatedPoints, this.selectedActivity.name);
-                await this.updateActivityPresetUsage(this.selectedActivityId);
-            } catch (error) {
-                console.error('Error claiming activity points:', error);
-                alert('Failed to claim activity points. Please try again.');
-            } finally {
-                this.closeActivityModal();
-                this.processingAction = false;
-            }
+            this.addPoints(this.calculatedPoints, this.selectedActivity.name);
+            this.closeActivityModal();
         },
-        async redeemPreset(entryId) {
-            if (this.processingAction){
-                alert('Request in progress. Please wait.');
-                return;
-            } 
+        redeemPreset(entryId) {
             const entry = this.redeemData[entryId];
             if (entry && entry.pointValue) {
-                this.processingAction = true;
-                try {
-                    await this.addPoints(entry.pointValue * -1, entry.name);
-                } catch (error) {
-                    console.error('Error redeeming preset:', error);
-                    alert('Failed to redeem reward. Please try again.');
-                } finally {
-                    this.processingAction = false;
-                }
+                this.addPoints(entry.pointValue * -1, entry.name);
             }
         },
         async logTrackingData() {
@@ -494,11 +393,6 @@ createApp({
                 return;
             }
 
-            if (this.processingAction){
-                alert('Request in progress. Please wait.');
-                return;
-            } 
-            this.processingAction = true;
             try {
                 const trackingRef = collection(db, 'users', this.currentUser, 'tracking');
                 await addDoc(trackingRef, {
@@ -507,14 +401,18 @@ createApp({
                     timestamp: Timestamp.now()
                 });
 
+                // Clear input and reload data
+                this.trackingInput = null;
                 await this.loadTrackingData();
+                
+                alert('Logging successful!');
             } catch (error) {
                 console.error(`Error logging ${this.trackingMetric} of ${this.trackingInput} for user ${this.currentUser}:`, error);
                 alert('Logging failed. Please try again.');
-            } finally {
-                this.trackingInput = null;
-                this.processingAction = false;
             }
+
+            // Clear the input
+            this.trackingInput = null;
         },
         setDateRange(days) {
             this.trackingDateRange = days;

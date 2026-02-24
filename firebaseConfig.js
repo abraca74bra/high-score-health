@@ -1,6 +1,6 @@
 // Import Firebase modules
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getFirestore, collection, getDocs, doc, getDoc, setDoc, updateDoc, addDoc, query, where, orderBy, onSnapshot, Timestamp, increment } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { getFirestore, collection, getDocs, doc, getDoc, setDoc, updateDoc, addDoc, query, where, orderBy, onSnapshot, Timestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
 const firebaseConfig = {
@@ -19,4 +19,4 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 
 // Export for use in other files
-export { db, auth, collection, getDocs, doc, getDoc, setDoc, updateDoc, addDoc, query, where, orderBy, onSnapshot, Timestamp, increment, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged };
+export { db, auth, collection, getDocs, doc, getDoc, setDoc, updateDoc, addDoc, query, where, orderBy, onSnapshot, Timestamp, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged };
