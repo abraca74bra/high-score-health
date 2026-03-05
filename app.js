@@ -34,6 +34,7 @@ createApp({
             showActivityModal: false,
             selectedActivity: null,
             selectedActivityId: null,
+            selectedRewardTag: null,
             selectedQuantity: null,
             selectedIntensity: 1, // 0=Easy, 1=Moderate, 2=Intense
             trackingMetric: 'weight',
@@ -261,6 +262,22 @@ createApp({
         },
         openTab(tabName) {
             this.activeTab = tabName;
+            if (tabName !== 'Redeem') {
+                this.selectedRewardTag = null;
+            }
+        },
+        toTitleCase(text) {
+            if (typeof text !== 'string') return '';
+            return text
+                .trim()
+                .toLowerCase()
+                .replace(/\b\w/g, (char) => char.toUpperCase());
+        },
+        selectRewardTag(tag) {
+            this.selectedRewardTag = tag;
+        },
+        clearSelectedRewardTag() {
+            this.selectedRewardTag = null;
         },
         async addPoints(pointsToAdd, memo = '') {
             if (!this.currentUser) {
@@ -535,6 +552,60 @@ createApp({
         }
     },
     computed: {
+        rewardTagIndex() {
+            if (!this.redeemData) {
+                return { tags: [], rewardsByTag: {} };
+            }
+
+            const rewardsByTagMap = new Map();
+
+            for (const [id, reward] of Object.entries(this.redeemData)) {
+                const rewardName = this.toTitleCase(reward?.name || '');
+                const tags = Array.isArray(reward?.tags) ? reward.tags : [];
+                const normalizedTags = [...new Set(tags
+                    .filter((tag) => typeof tag === 'string')
+                    .map((tag) => this.toTitleCase(tag))
+                    .filter((tag) => tag.length > 0)
+                )];
+
+                if (normalizedTags.length === 0) {
+                    console.warn('Reward missing valid tags; skipping from tag tiles.', {
+                        rewardId: id,
+                        rewardName: reward?.name || null
+                    });
+                    continue;
+                }
+
+                const rewardView = {
+                    id,
+                    displayName: rewardName,
+                    pointValue: reward?.pointValue ?? 0
+                };
+
+                for (const tag of normalizedTags) {
+                    if (!rewardsByTagMap.has(tag)) {
+                        rewardsByTagMap.set(tag, []);
+                    }
+                    rewardsByTagMap.get(tag).push(rewardView);
+                }
+            }
+
+            const tags = Array.from(rewardsByTagMap.keys()).sort((a, b) => a.localeCompare(b));
+            const rewardsByTag = {};
+
+            for (const tag of tags) {
+                rewardsByTag[tag] = rewardsByTagMap.get(tag).sort((a, b) => a.displayName.localeCompare(b.displayName));
+            }
+
+            return { tags, rewardsByTag };
+        },
+        availableRewardTags() {
+            return this.rewardTagIndex.tags;
+        },
+        rewardsForSelectedTag() {
+            if (!this.selectedRewardTag) return [];
+            return this.rewardTagIndex.rewardsByTag[this.selectedRewardTag] || [];
+        },
         filteredEarnData() {
             if (!this.earnData) return {};
 

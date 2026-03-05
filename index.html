@@ -142,9 +142,25 @@
 
         <div v-show="activeTab === 'Redeem'" class="tabcontent">
             <h3>Spend Points</h3>
-            <div v-for="(widget, id) in redeemData" :key="id" class="widget" @click="redeemPreset(id)">
-                <div class="title">{{ widget.name }}</div>
-                <div class="value">{{ widget.pointValue }}</div>
+            <div v-if="!selectedRewardTag">
+                <div v-if="availableRewardTags.length" class="tile-grid">
+                    <div v-for="tag in availableRewardTags" :key="tag" class="activity-tile reward-tag-tile" @click="selectRewardTag(tag)">
+                        <div class="tile-name">{{ tag }}</div>
+                    </div>
+                </div>
+                <p v-else class="empty-state-message">No reward tags available.</p>
+            </div>
+            <div v-else>
+                <div class="redeem-tag-header">
+                    <button class="back-to-tags-button" @click="clearSelectedRewardTag">← Back to Tags</button>
+                </div>
+                <div v-if="rewardsForSelectedTag.length" class="tile-grid">
+                    <div v-for="reward in rewardsForSelectedTag" :key="reward.id" class="activity-tile reward-item-tile" @click="redeemPreset(reward.id)">
+                        <div class="tile-name">{{ reward.displayName }}</div>
+                        <div class="tile-value">{{ reward.pointValue }}</div>
+                    </div>
+                </div>
+                <p v-else class="empty-state-message">No rewards available for this tag.</p>
             </div>
             <!-- Fixed bottom container for custom entry -->
             <div class="fixed-bottom-container">

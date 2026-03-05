@@ -356,6 +356,53 @@ button {
     margin-top: 8px;
 }
 
+.reward-tag-tile {
+    justify-content: center;
+}
+
+.reward-tag-tile .tile-name {
+    margin-top: 0;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.reward-item-tile {
+    justify-content: center;
+    gap: 8px;
+}
+
+.reward-item-tile .tile-name {
+    margin-top: 0;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.tile-value {
+    font-size: 13px;
+    font-weight: 700;
+    color: orange;
+}
+
+.redeem-tag-header {
+    padding: 0 15px;
+    margin-top: 10px;
+}
+
+.back-to-tags-button {
+    background-color: #f5f5f5;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.empty-state-message {
+    margin: 15px;
+    font-size: 14px;
+    color: #666;
+}
+
 /* Toggle switches */
 .toggle-container {
     display: flex;
